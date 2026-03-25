@@ -9,7 +9,6 @@ export default function ScrollProgress() {
     useEffect(() => {
         const bar = document.getElementById("scroll-bar");
         if (!bar) return;
-
         gsap.to(bar, {
             width: "100%",
             ease: "none",
@@ -17,10 +16,9 @@ export default function ScrollProgress() {
                 trigger: document.documentElement,
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 0.3,
+                scrub: 0.2,
             },
         });
     }, []);
-
-    return <div id="scroll-bar" />;
+    return <div id="scroll-bar" aria-hidden />;
 }
