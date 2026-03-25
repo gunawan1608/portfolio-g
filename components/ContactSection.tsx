@@ -5,11 +5,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const EMAIL = "gunawanmadia@email.com"; // ← ganti dengan email asli
+const EMAIL = "tamagunawan08@gmail.com"; 
 const SOCIALS = [
-    { label: "GitHub", handle: "github.com/gunawan-mp", href: "https://github.com/" },
-    { label: "LinkedIn", handle: "linkedin.com/in/gunawan-mp", href: "https://linkedin.com/" },
-    { label: "Instagram", handle: "@gunawanmp", href: "https://instagram.com/" },
+    { label: "GitHub", handle: "github.com/gunawan1608", href: "https://github.com/gunawan1608" },
+    { label: "LinkedIn", handle: "linkedin.com/in/Gunawan Madia Pratama", href: "https://www.linkedin.com/in/gunawan-madia-pratama-3172753a5/" },
+    { label: "Instagram", handle: "@gm_pratama16", href: "https://instagram.com/gm_pratama16" },
 ];
 
 export default function ContactSection() {
