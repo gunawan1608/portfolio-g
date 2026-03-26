@@ -8,116 +8,104 @@ export default function CursorFollower() {
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (coarsePointer || reducedMotion) {
-      return;
-    }
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (coarse || reduced) return;
 
     const dot = dotRef.current;
     const ring = ringRef.current;
-
-    if (!dot || !ring) {
-      return;
-    }
+    if (!dot || !ring) return;
 
     document.body.style.cursor = "none";
 
-    gsap.set([dot, ring], {
-      xPercent: -50,
-      yPercent: -50,
-      autoAlpha: 0,
-    });
+    let mouseX = -200;
+    let mouseY = -200;
+    let ringX = -200;
+    let ringY = -200;
+    let visible = false;
+    let raf = 0;
 
-    const moveDotX = gsap.quickTo(dot, "x", { duration: 0.08, ease: "power3.out" });
-    const moveDotY = gsap.quickTo(dot, "y", { duration: 0.08, ease: "power3.out" });
-    const moveRingX = gsap.quickTo(ring, "x", { duration: 0.22, ease: "power3.out" });
-    const moveRingY = gsap.quickTo(ring, "y", { duration: 0.22, ease: "power3.out" });
+    // Position both off-screen initially via style (avoid GSAP initial state conflict)
+    dot.style.opacity = "0";
+    ring.style.opacity = "0";
+    dot.style.transform = "translate(-200px, -200px) translate(-50%, -50%)";
+    ring.style.transform = "translate(-200px, -200px) translate(-50%, -50%)";
 
-    const showCursor = () => {
-      gsap.to([dot, ring], {
-        autoAlpha: 1,
-        duration: 0.16,
-        overwrite: true,
-      });
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const tick = () => {
+      ringX = lerp(ringX, mouseX, 0.12);
+      ringY = lerp(ringY, mouseY, 0.12);
+
+      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+      raf = requestAnimationFrame(tick);
     };
 
-    const hideCursor = () => {
-      gsap.to([dot, ring], {
-        autoAlpha: 0,
-        duration: 0.18,
-        overwrite: true,
-      });
+    const show = () => {
+      if (!visible) {
+        visible = true;
+        gsap.to([dot, ring], { opacity: 1, duration: 0.18, overwrite: true });
+      }
     };
 
-    const activateCursor = () => {
-      gsap.to(dot, { scale: 1.4, duration: 0.2, overwrite: true });
-      gsap.to(ring, { scale: 1.15, duration: 0.25, overwrite: true });
+    const hide = () => {
+      if (visible) {
+        visible = false;
+        gsap.to([dot, ring], { opacity: 0, duration: 0.18, overwrite: true });
+      }
     };
 
-    const resetCursor = () => {
+    const expand = () => {
+      gsap.to(dot, { scale: 1.6, duration: 0.2, overwrite: true });
+      gsap.to(ring, { scale: 1.3, duration: 0.25, overwrite: true });
+    };
+
+    const shrink = () => {
       gsap.to(dot, { scale: 1, duration: 0.2, overwrite: true });
       gsap.to(ring, { scale: 1, duration: 0.25, overwrite: true });
     };
 
-    const handleMove = (event: PointerEvent) => {
-      showCursor();
-      moveDotX(event.clientX);
-      moveDotY(event.clientY);
-      moveRingX(event.clientX);
-      moveRingY(event.clientY);
+    const onMove = (e: PointerEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      show();
     };
 
-    const handlePointerOver = (event: Event) => {
-      const target = event.target as HTMLElement | null;
-
-      if (target?.closest("a, button, [data-hover]")) {
-        activateCursor();
-      }
+    const onOver = (e: Event) => {
+      if ((e.target as HTMLElement)?.closest("a, button, [data-hover]")) expand();
     };
 
-    const handlePointerOut = (event: Event) => {
-      const target = event.target as HTMLElement | null;
-      const related = (event as MouseEvent).relatedTarget as HTMLElement | null;
-
-      if (
-        target?.closest("a, button, [data-hover]") &&
-        !related?.closest("a, button, [data-hover]")
-      ) {
-        resetCursor();
-      }
+    const onOut = (e: Event) => {
+      const t = e.target as HTMLElement;
+      const rel = (e as MouseEvent).relatedTarget as HTMLElement;
+      if (t?.closest("a, button, [data-hover]") && !rel?.closest("a, button, [data-hover]")) shrink();
     };
 
-    const handlePointerDown = () => {
-      gsap.to(ring, { scale: 0.92, duration: 0.12, overwrite: true });
-    };
+    const onDown = () => gsap.to(ring, { scale: 0.85, duration: 0.1, overwrite: true });
+    const onUp = () => shrink();
 
-    const handlePointerUp = () => {
-      resetCursor();
-    };
+    raf = requestAnimationFrame(tick);
 
-    window.addEventListener("pointermove", handleMove, { passive: true });
-    window.addEventListener("pointerdown", handlePointerDown, { passive: true });
-    window.addEventListener("pointerup", handlePointerUp, { passive: true });
-    window.addEventListener("blur", hideCursor);
-    document.documentElement.addEventListener("pointerleave", hideCursor);
-    document.addEventListener("pointerover", handlePointerOver);
-    document.addEventListener("pointerout", handlePointerOut);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
+    window.addEventListener("blur", hide);
+    document.documentElement.addEventListener("pointerleave", hide);
+    document.addEventListener("pointerover", onOver);
+    document.addEventListener("pointerout", onOut);
 
     return () => {
+      cancelAnimationFrame(raf);
       document.body.style.cursor = "";
-      window.removeEventListener("pointermove", handleMove);
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("blur", hideCursor);
-      document.documentElement.removeEventListener("pointerleave", hideCursor);
-      document.removeEventListener("pointerover", handlePointerOver);
-      document.removeEventListener("pointerout", handlePointerOut);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("blur", hide);
+      document.documentElement.removeEventListener("pointerleave", hide);
+      document.removeEventListener("pointerover", onOver);
+      document.removeEventListener("pointerout", onOut);
     };
   }, []);
 

@@ -10,6 +10,7 @@ export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const [activeId, setActiveId] = useState<SectionId | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!navRef.current) {
@@ -31,12 +32,8 @@ export default function Navbar() {
     const readState = () => {
       setScrolled(window.scrollY > 18);
 
-      if (window.scrollY < 100) {
-        setActiveId(null);
-        return;
-      }
-
-      const marker = window.scrollY + window.innerHeight * 0.3;
+      const navHeight = navRef.current?.offsetHeight ?? 0;
+      const marker = navHeight + 28;
       let current: SectionId | null = null;
 
       for (const item of navigationItems) {
@@ -46,11 +43,13 @@ export default function Navbar() {
           continue;
         }
 
-        const start = section.offsetTop - 120;
-        const end = start + section.offsetHeight;
+        const rect = section.getBoundingClientRect();
+        const start = rect.top;
+        const end = rect.bottom;
 
         if (marker >= start && marker < end) {
           current = item.id;
+          break;
         }
       }
 
@@ -82,13 +81,40 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 860px)");
+    const syncMenuState = (event?: MediaQueryListEvent) => {
+      const matches = event ? event.matches : mediaQuery.matches;
+
+      if (!matches) {
+        setMenuOpen(false);
+      }
+    };
+
+    syncMenuState();
+
+    mediaQuery.addEventListener("change", syncMenuState);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncMenuState);
+    };
+  }, []);
+
+  const handleNavigate = (target: SectionId | "top") => {
+    setMenuOpen(false);
+    scrollToSection(target);
+  };
+
   return (
-    <header ref={navRef} className={`site-nav${scrolled ? " is-scrolled" : ""}`}>
+    <header
+      ref={navRef}
+      className={`site-nav${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-open" : ""}`}
+    >
       <div className="container nav-shell">
         <button
           type="button"
           className="nav-brand"
-          onClick={() => scrollToSection("top")}
+          onClick={() => handleNavigate("top")}
           data-hover
           aria-label="Back to top"
         >
@@ -99,13 +125,28 @@ export default function Navbar() {
           </span>
         </button>
 
-        <nav className="nav-links" aria-label="Primary">
+        <button
+          type="button"
+          className="nav-toggle"
+          onClick={() => setMenuOpen((current) => !current)}
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        >
+          <span className="nav-toggle-lines" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+
+        <nav id="primary-navigation" className="nav-links" aria-label="Primary">
           {navigationItems.map((item) => (
             <motion.button
               key={item.id}
               type="button"
               className={`nav-link${activeId === item.id ? " is-active" : ""}`}
-              onClick={() => scrollToSection(item.id)}
+              onClick={() => handleNavigate(item.id)}
               whileHover={{ y: -1 }}
               transition={{ duration: 0.2 }}
               data-hover
@@ -114,17 +155,6 @@ export default function Navbar() {
             </motion.button>
           ))}
         </nav>
-
-        <motion.button
-          type="button"
-          className="button button-primary nav-cta"
-          onClick={() => scrollToSection("contact")}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          data-hover
-        >
-          Contact Me
-        </motion.button>
       </div>
     </header>
   );

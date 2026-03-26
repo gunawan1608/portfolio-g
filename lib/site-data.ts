@@ -41,7 +41,7 @@ export type AchievementEntry = {
 export const profile = {
   name: "Gunawan Madia Pratama",
   initials: "GM",
-  role: "Frontend Developer",
+  role: "Software Developer",
   location: "Indonesia",
   intro:
     "I build clean websites with thoughtful motion, responsive layouts, and a strong focus on detail.",
@@ -50,9 +50,9 @@ export const profile = {
   about:
     "I enjoy building interfaces that feel clear, calm, and polished. My focus is frontend development, but I also care about structure, rhythm, and the final presentation of a page.",
   focus: [
-    "Clean UI and component structure",
-    "Smooth motion and transitions",
-    "Responsive layout and visual consistency",
+    "Learning Laravel Framework",
+    "Developing Personal Portfolio",
+    "Building Real-World Projects",
   ],
   email: "tamagunawan08@gmail.com",
   socials: [
@@ -63,7 +63,7 @@ export const profile = {
     },
     {
       label: "LinkedIn",
-      handle: "linkedin.com/in/gunawan-madia-pratama",
+      handle: "linkedin.com/Gunawan-Madia-Pratama",
       href: "https://www.linkedin.com/in/gunawan-madia-pratama-3172753a5/",
     },
     {

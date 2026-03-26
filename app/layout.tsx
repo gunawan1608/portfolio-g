@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
   title: "Gunawan Madia Pratama | Portfolio",
@@ -29,10 +28,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>
-        <ScrollProgress />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" role="img" aria-labelledby="ciscoTitle">
+  <title id="ciscoTitle">Cisco</title>
+  <g fill="#1BA0D7">
+    <rect x="8" y="20" width="4" height="10" rx="2" />
+    <rect x="16" y="13" width="4" height="17" rx="2" />
+    <rect x="24" y="8" width="4" height="22" rx="2" />
+    <rect x="32" y="14" width="4" height="16" rx="2" />
+    <rect x="40" y="19" width="4" height="11" rx="2" />
+    <rect x="52" y="19" width="4" height="11" rx="2" />
+    <rect x="60" y="14" width="4" height="16" rx="2" />
+    <rect x="68" y="8" width="4" height="22" rx="2" />
+    <rect x="76" y="13" width="4" height="17" rx="2" />
+    <rect x="84" y="20" width="4" height="10" rx="2" />
+  </g>
+  <text
+    x="48"
+    y="54"
+    text-anchor="middle"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="16"
+    font-weight="700"
+    letter-spacing="0.08em"
+    fill="#1BA0D7"
+  >
+    CISCO
+  </text>
+</svg>

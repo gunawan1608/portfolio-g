@@ -8,6 +8,7 @@ import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
 import ProjectsSection from "@/components/ProjectsSection";
 import SkillsSection from "@/components/SkillsSection";
+import ScrollAnimWrapper from "@/components/ScrollAnimWrapper";
 
 export default function Home() {
   return (
@@ -15,13 +16,32 @@ export default function Home() {
       <CursorFollower />
       <Navbar />
       <main className="site-main">
+        {/* Hero has its own entrance animation, no wrapper needed */}
         <HeroSection />
-        <ProjectsSection />
-        <SkillsSection />
-        <AboutSection />
-        <AchievementsSection />
-        <ExperienceSection />
-        <ContactSection />
+
+        <ScrollAnimWrapper>
+          <ProjectsSection />
+        </ScrollAnimWrapper>
+
+        <ScrollAnimWrapper delay={0.05}>
+          <SkillsSection />
+        </ScrollAnimWrapper>
+
+        <ScrollAnimWrapper>
+          <AboutSection />
+        </ScrollAnimWrapper>
+
+        <ScrollAnimWrapper delay={0.05}>
+          <AchievementsSection />
+        </ScrollAnimWrapper>
+
+        <ScrollAnimWrapper>
+          <ExperienceSection />
+        </ScrollAnimWrapper>
+
+        <ScrollAnimWrapper delay={0.05}>
+          <ContactSection />
+        </ScrollAnimWrapper>
       </main>
       <Footer />
     </div>
