@@ -1,27 +1,29 @@
-import CursorFollower   from "@/components/CursorFollower";
-import Navbar           from "@/components/Navbar";
-import HeroSection      from "@/components/HeroSection";
-import ProjectsSection  from "@/components/ProjectsSection";
-import SkillsSection    from "@/components/SkillsSection";
-import AboutSection     from "@/components/AboutSection";
+import AboutSection from "@/components/AboutSection";
+import AchievementsSection from "@/components/AchievementsSection";
+import ContactSection from "@/components/ContactSection";
+import CursorFollower from "@/components/CursorFollower";
 import ExperienceSection from "@/components/ExperienceSection";
-import ContactSection   from "@/components/ContactSection";
-import Footer           from "@/components/Footer";
+import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import Navbar from "@/components/Navbar";
+import ProjectsSection from "@/components/ProjectsSection";
+import SkillsSection from "@/components/SkillsSection";
 
 export default function Home() {
   return (
-    <>
+    <div className="site-shell">
       <CursorFollower />
       <Navbar />
-      <main>
+      <main className="site-main">
         <HeroSection />
         <ProjectsSection />
         <SkillsSection />
         <AboutSection />
+        <AchievementsSection />
         <ExperienceSection />
         <ContactSection />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
