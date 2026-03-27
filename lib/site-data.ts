@@ -36,6 +36,10 @@ export type AchievementEntry = {
   type: string;
   note: string;
   accent: string;
+  skills: string[];
+  credentialId?: string;
+  documentSlug: string;
+  documentFileName: string;
 };
 
 export const profile = {
@@ -151,31 +155,41 @@ export const experiences: ExperienceEntry[] = [
 
 export const achievements: AchievementEntry[] = [
   {
-    id: "achievement-01",
-    title: "Certificate Placeholder 01",
-    issuer: "Institution or event name",
-    receivedAt: "Date will be added later",
-    type: "Certificate",
-    note: "This preview uses an empty canvas for now and can be replaced with the real file later.",
+    id: "achievement-rpl-training",
+    title: "Pelatihan Kompetensi RPL",
+    issuer: "P4 Jakarta Pusat - Dinas Pendidikan DKI Jakarta",
+    receivedAt: "September 2025",
+    type: "Training",
+    note: "Software engineering training focused on database practice and Laravel-based development.",
     accent: "#42a66a",
+    skills: ["Database", "Laravel"],
+    documentSlug: "pelatihan-kompetensi-rpl",
+    documentFileName: "Gunawan Madia Pratama.pdf",
   },
   {
-    id: "achievement-02",
-    title: "Certificate Placeholder 02",
-    issuer: "Program or organizer name",
-    receivedAt: "Date will be added later",
-    type: "Achievement",
-    note: "Prepared as a clean preview slot for future certificate uploads.",
+    id: "achievement-aws-cloud",
+    title: "Job Roles in the Cloud",
+    issuer: "AWS Training Online",
+    receivedAt: "Jan 2024",
+    type: "Cloud",
+    note: "Certificate of completion covering cloud-focused job roles and foundational AWS learning.",
     accent: "#74c08d",
+    skills: ["Cloud"],
+    documentSlug: "job-roles-in-the-cloud",
+    documentFileName: "156_3_4826221_1705927366_AWS Course Completion Certificate.pdf",
   },
   {
-    id: "achievement-03",
-    title: "Certificate Placeholder 03",
-    issuer: "Competition or training name",
-    receivedAt: "Date will be added later",
-    type: "Award",
-    note: "The real certificate image can be added here later without changing the layout.",
+    id: "achievement-data-analytics",
+    title: "Data Analytics untuk Siswa SMA/Sederajat",
+    issuer: "Digital Talent Scholarship",
+    receivedAt: "July 2024",
+    type: "Certificate",
+    note: "Issued through Digital Talent Scholarship with a registered credential ID for verification.",
     accent: "#2f8a57",
+    skills: ["Data Analyst"],
+    credentialId: "1948180850-12/TA/BLSDM.Kominfo/2024",
+    documentSlug: "data-analytics-siswa-sma",
+    documentFileName: "Sertifikat_GUNAWAN MADIA PRATAMA_Data Analytics untuk Siswa SMA_Sederajat.pdf",
   },
 ];
 

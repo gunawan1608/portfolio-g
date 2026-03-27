@@ -13,6 +13,8 @@ export default function CertificateModal({
   certificate,
   onClose,
 }: CertificateModalProps) {
+  const documentUrl = `/documents/${certificate.documentSlug}`;
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -55,22 +57,34 @@ export default function CertificateModal({
             <p className="eyebrow">{certificate.type}</p>
             <h3>{certificate.title}</h3>
           </div>
-          <button
-            type="button"
-            className="button button-ghost button-compact"
-            onClick={onClose}
-            data-hover
-          >
-            Close
-          </button>
+          <div className="certificate-modal-actions">
+            <motion.a
+              href={documentUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="button button-primary button-compact"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              data-hover
+            >
+              Open PDF
+            </motion.a>
+            <button
+              type="button"
+              className="button button-ghost button-compact"
+              onClick={onClose}
+              data-hover
+            >
+              Close
+            </button>
+          </div>
         </div>
 
         <div className="certificate-modal-preview">
-          <canvas
-            className="certificate-canvas"
-            width={1200}
-            height={840}
-            aria-label={`Canvas placeholder for ${certificate.title}`}
+          <iframe
+            className="certificate-pdf"
+            src={`${documentUrl}#view=FitH`}
+            title={`PDF preview for ${certificate.title}`}
           />
         </div>
 
@@ -83,6 +97,16 @@ export default function CertificateModal({
             <span>Received</span>
             <strong>{certificate.receivedAt}</strong>
           </div>
+          <div>
+            <span>Skills</span>
+            <strong>{certificate.skills.join(", ")}</strong>
+          </div>
+          {certificate.credentialId ? (
+            <div>
+              <span>Credential ID</span>
+              <strong>{certificate.credentialId}</strong>
+            </div>
+          ) : null}
         </div>
 
         <p className="certificate-note">{certificate.note}</p>

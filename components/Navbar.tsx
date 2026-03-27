@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { navigationItems, scrollToSection, type SectionId } from "@/lib/navigation";
 import { profile } from "@/lib/site-data";
+import brandLogo from "@/assets/images/GMP.png";
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
@@ -118,7 +120,15 @@ export default function Navbar() {
           data-hover
           aria-label="Back to top"
         >
-          <span className="nav-brand-mark">{profile.initials}</span>
+          <span className="nav-brand-mark" aria-hidden>
+            <Image
+              src={brandLogo}
+              alt=""
+              className="nav-brand-logo"
+              sizes="44px"
+              priority
+            />
+          </span>
           <span className="nav-brand-copy">
             <strong>{profile.name}</strong>
             <span>{profile.role}</span>

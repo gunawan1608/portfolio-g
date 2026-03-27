@@ -357,10 +357,16 @@ section {
   width: 2.8rem;
   height: 2.8rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-soft) 100%);
-  color: #f6fff9;
-  font-family: var(--display);
-  font-size: 1.2rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(47, 138, 87, 0.12);
+  box-shadow: 0 8px 20px rgba(47, 138, 87, 0.12);
+}
+
+.nav-brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .nav-brand-copy {
@@ -972,23 +978,15 @@ section {
   overflow: hidden;
 }
 
-.achievement-preview::before,
 .achievement-preview::after {
   content: "";
   position: absolute;
-  left: 12%;
-  height: 1px;
-  background: rgba(24, 48, 32, 0.12);
-}
-
-.achievement-preview::before {
-  top: 38%;
-  width: 56%;
-}
-
-.achievement-preview::after {
-  top: 50%;
-  width: 40%;
+  inset: auto -2rem -2.4rem auto;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--achievement-accent) 10%, transparent);
+  filter: blur(4px);
 }
 
 .achievement-chip {
@@ -1002,6 +1000,33 @@ section {
   font-family: var(--mono);
   font-size: 0.62rem;
   letter-spacing: 0.08em;
+}
+
+.achievement-preview-sheet {
+  position: absolute;
+  inset: 1rem 1rem auto;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(47, 138, 87, 0.12);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 12px 24px rgba(41, 81, 53, 0.08);
+}
+
+.achievement-preview-label {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.achievement-preview-sheet strong {
+  display: block;
+  margin-top: 0.7rem;
+  max-width: 12rem;
+  color: var(--text-soft);
+  line-height: 1.4;
 }
 
 .achievement-body h3 {
@@ -1018,6 +1043,32 @@ section {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-faint);
+}
+
+.achievement-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.achievement-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.68rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--achievement-accent) 12%, white);
+  color: var(--green-ink);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+}
+
+.achievement-credential {
+  margin-top: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 /* ─── Experience ──────────────────────────────────────────────── */
@@ -1177,6 +1228,13 @@ section {
   align-items: start;
 }
 
+.certificate-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
 .certificate-modal-head h3 {
   margin-top: 0.7rem;
   font-family: var(--display);
@@ -1188,19 +1246,18 @@ section {
 
 .certificate-modal-preview {
   margin-top: 1.2rem;
-  padding: 1rem;
+  padding: 0.8rem;
   border-radius: 24px;
   border: 1px solid var(--line);
   background: linear-gradient(180deg, #fbfefb 0%, #eff7f0 100%);
 }
 
-.certificate-canvas {
+.certificate-pdf {
   width: 100%;
-  height: auto;
-  aspect-ratio: 1.43;
+  min-height: min(72vh, 760px);
   border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff 0%, #edf5ef 100%);
   border: 1px solid rgba(47, 138, 87, 0.1);
+  background: #fff;
 }
 
 .certificate-meta-grid {
@@ -1399,6 +1456,12 @@ section {
 
   .certificate-modal {
     padding: 0.7rem;
+  }
+
+  .certificate-modal-head,
+  .certificate-modal-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
