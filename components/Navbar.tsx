@@ -120,6 +120,7 @@ export default function Navbar() {
           data-hover
           aria-label="Back to top"
         >
+          {/* Logo tanpa background apapun */}
           <span className="nav-brand-mark" aria-hidden>
             <Image
               src={brandLogo}
