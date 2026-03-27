@@ -577,10 +577,12 @@ section {
 }
 
 @keyframes pulse-dot {
+
   0%,
   100% {
     box-shadow: 0 0 0 3px rgba(47, 138, 87, 0.2);
   }
+
   50% {
     box-shadow: 0 0 0 6px rgba(47, 138, 87, 0.08);
   }
@@ -1227,9 +1229,10 @@ section {
   display: grid;
   place-items: center;
   padding: 1.25rem;
-  background: rgba(8, 20, 13, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  /* Sebelumnya: rgba(8,20,13,0.6) — terlalu gelap */
+  background: rgba(23, 50, 35, 0.38);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
 }
 
 /* ── Shell: two-column split ── */
@@ -1241,10 +1244,12 @@ section {
   border-radius: 28px;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid rgba(219, 232, 221, 0.8);
+  border: 1px solid rgba(219, 232, 221, 0.9);
   box-shadow:
-    0 56px 112px rgba(8, 20, 13, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+    0 40px 80px rgba(15, 40, 24, 0.18),
+    0 8px 24px rgba(15, 40, 24, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  will-change: transform, opacity;
 }
 
 /* ── LEFT: PDF viewer area ── */
@@ -1252,33 +1257,19 @@ section {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #f0f5f1;
+  /* Warna lebih terang — bukan abu gelap */
+  background: #f4f8f5;
   border-right: 1px solid var(--line);
   overflow: hidden;
 }
 
-/* ── PDF viewport (react-pdf wrapper) ── */
+/* ── PDF viewport ── */
 .certv3-pdf-viewport {
   position: relative;
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 1.25rem;
-  gap: 0.75rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(47, 138, 87, 0.18) transparent;
-}
-
-.certv3-pdf-viewport::-webkit-scrollbar {
-  width: 4px;
-}
-
-.certv3-pdf-viewport::-webkit-scrollbar-thumb {
-  background: rgba(47, 138, 87, 0.2);
-  border-radius: 999px;
 }
 
 .certv3-pdf-doc-wrap {
@@ -1286,56 +1277,55 @@ section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  will-change: opacity;
 }
 
+/* Frame tanpa border, background putih bersih */
 .certv3-pdf-frame {
   width: 100%;
   height: 100%;
   min-height: 100%;
   border: none;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow:
-    0 4px 24px rgba(15, 40, 24, 0.1),
-    0 1px 4px rgba(15, 40, 24, 0.06);
+  background: #ffffff;
+  display: block;
 }
 
-/* ── Skeleton overlay (fades out when PDF loads) ── */
+/* ── Skeleton overlay ── */
 .certv3-skeleton-overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: #f0f5f1;
+  background: #f4f8f5;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
   padding: 2rem;
+  will-change: opacity;
 }
 
-/* ── Skeleton: atmospheric blurred faux-document ── */
+/* ── Skeleton: atmospheric faux-document ── */
 .certv3-skeleton {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   width: 100%;
 }
 
 .certv3-skeleton-doc {
-  width: min(340px, 100%);
-  aspect-ratio: 0.707; /* A4 ratio */
-  border-radius: 12px;
+  width: min(300px, 100%);
+  aspect-ratio: 0.707;
+  border-radius: 10px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(47, 138, 87, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(47, 138, 87, 0.12);
   box-shadow:
-    0 8px 32px rgba(15, 40, 24, 0.08),
+    0 8px 32px rgba(15, 40, 24, 0.07),
     0 1px 4px rgba(15, 40, 24, 0.04);
-  filter: blur(1.5px);
-  opacity: 0.85;
+  filter: blur(1px);
+  opacity: 0.9;
 }
 
 .certv3-skeleton-doc-inner {
@@ -1346,62 +1336,72 @@ section {
   height: 100%;
 }
 
-/* Header placeholder bar */
 .certv3-sk-header {
-  height: 28px;
-  border-radius: 6px;
+  height: 24px;
+  border-radius: 5px;
   background: linear-gradient(90deg,
-    rgba(47, 138, 87, 0.12) 25%,
-    rgba(47, 138, 87, 0.22) 50%,
-    rgba(47, 138, 87, 0.12) 75%);
+      rgba(47, 138, 87, 0.1) 25%,
+      rgba(47, 138, 87, 0.2) 50%,
+      rgba(47, 138, 87, 0.1) 75%);
   background-size: 200% 100%;
-  animation: certv3-shimmer 1.8s ease-in-out infinite;
-  width: 55%;
+  animation: certv3-shimmer 1.9s ease-in-out infinite;
+  width: 52%;
   margin: 0 auto;
 }
 
-/* Seal/logo circle placeholder */
 .certv3-sk-seal {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(47, 138, 87, 0.14), rgba(47, 138, 87, 0.08));
-  border: 1.5px solid rgba(47, 138, 87, 0.15);
+  background: linear-gradient(135deg, rgba(47, 138, 87, 0.14), rgba(47, 138, 87, 0.06));
+  border: 1.5px solid rgba(47, 138, 87, 0.14);
   margin: 0.5rem auto 0;
-  animation: certv3-pulse 2.2s ease-in-out infinite;
+  animation: certv3-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes certv3-pulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.03); }
+
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
 }
 
-/* Text lines */
 .certv3-sk-lines {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
 .certv3-sk-line {
   display: block;
-  height: 7px;
+  height: 6px;
   border-radius: 999px;
   background: linear-gradient(90deg,
-    rgba(47, 138, 87, 0.07) 25%,
-    rgba(47, 138, 87, 0.15) 50%,
-    rgba(47, 138, 87, 0.07) 75%);
+      rgba(47, 138, 87, 0.06) 25%,
+      rgba(47, 138, 87, 0.14) 50%,
+      rgba(47, 138, 87, 0.06) 75%);
   background-size: 200% 100%;
-  animation: certv3-shimmer 1.8s ease-in-out infinite;
+  animation: certv3-shimmer 1.9s ease-in-out infinite;
 }
 
 @keyframes certv3-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-/* Signature strip */
 .certv3-sk-sig-row {
   display: flex;
   gap: 2rem;
@@ -1412,14 +1412,14 @@ section {
 
 .certv3-sk-sig {
   flex: 1;
-  height: 28px;
+  height: 24px;
   border-radius: 4px;
   background: linear-gradient(90deg,
-    rgba(47, 138, 87, 0.06) 25%,
-    rgba(47, 138, 87, 0.13) 50%,
-    rgba(47, 138, 87, 0.06) 75%);
+      rgba(47, 138, 87, 0.05) 25%,
+      rgba(47, 138, 87, 0.12) 50%,
+      rgba(47, 138, 87, 0.05) 75%);
   background-size: 200% 100%;
-  animation: certv3-shimmer 1.8s ease-in-out infinite 0.3s;
+  animation: certv3-shimmer 1.9s ease-in-out infinite 0.3s;
 }
 
 .certv3-sk-sig-alt {
@@ -1428,53 +1428,10 @@ section {
 
 .certv3-skeleton-label {
   font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
-}
-
-/* ── Page controls ── */
-.certv3-page-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 1rem;
-  border-top: 1px solid var(--line);
-  background: rgba(247, 251, 246, 0.9);
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.certv3-page-btn {
-  display: grid;
-  place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background 0.16s, color 0.16s, border-color 0.16s;
-}
-
-.certv3-page-btn:hover:not(:disabled) {
-  background: var(--green-pale);
-  color: var(--green-ink);
-  border-color: var(--green-soft);
-}
-
-.certv3-page-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.certv3-page-count {
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
 }
 
 /* ── RIGHT: sidebar ── */
@@ -1503,21 +1460,22 @@ section {
   top: 1rem;
   right: 1rem;
   z-index: 2;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.8rem;
+  height: 1.8rem;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--line);
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 0.18s, color 0.18s;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
 }
 
 .certv3-close:hover {
-  background: rgba(0, 0, 0, 0.09);
+  background: rgba(0, 0, 0, 0.08);
   color: var(--text);
+  border-color: var(--line-strong);
 }
 
 /* Inner layout */
@@ -1547,7 +1505,7 @@ section {
 /* Title */
 .certv3-title {
   font-family: var(--display);
-  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
   line-height: 1.0;
   letter-spacing: -0.04em;
   font-weight: 400;
@@ -1587,7 +1545,7 @@ section {
 
 .certv3-meta-row dt {
   font-family: var(--mono);
-  font-size: 0.56rem;
+  font-size: 0.55rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -1596,13 +1554,13 @@ section {
 .certv3-meta-row dd {
   margin: 0;
   color: var(--text-soft);
-  font-size: 0.88rem;
+  font-size: 0.87rem;
   line-height: 1.45;
 }
 
 .certv3-credential {
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   letter-spacing: 0.04em;
   word-break: break-all;
 }
@@ -1616,7 +1574,7 @@ section {
 
 .certv3-skills-label {
   font-family: var(--mono);
-  font-size: 0.56rem;
+  font-size: 0.55rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -1651,27 +1609,32 @@ section {
   border-top: 1px dashed var(--line);
 }
 
-/* CTA */
+/* CTA — buka PDF di tab baru, cepat tanpa lag */
 .certv3-open-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.78rem 1.1rem;
+  padding: 0.8rem 1.1rem;
   border-radius: 999px;
   color: #ffffff;
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
   margin-top: auto;
-  transition: filter 0.22s, transform 0.22s;
+  transition:
+    filter 0.22s var(--ease-out),
+    transform 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }
 
 .certv3-open-btn:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
   transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
 }
 
 /* ─── Footer ──────────────────────────────────────────────────── */
@@ -1709,6 +1672,7 @@ section {
 
 /* ─── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 1100px) {
+
   .hero-shell,
   .section-top,
   .about-grid,
@@ -1796,25 +1760,6 @@ section {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  /* Modal responsive */
-  .certv3-shell {
-    grid-template-columns: 1fr;
-    grid-template-rows: 52vh auto;
-    height: auto;
-    max-height: calc(100dvh - 2.5rem);
-    overflow-y: auto;
-  }
-
-  .certv3-viewer {
-    border-right: none;
-    border-bottom: 1px solid var(--line);
-    min-height: 52vh;
-  }
-
-  .certv3-sidebar {
-    overflow: visible;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1856,8 +1801,29 @@ section {
   .achievement-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  /* Modal mobile */
+@media (max-width: 860px) {
+  .certv3-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52vh auto;
+    height: auto;
+    max-height: calc(100dvh - 2.5rem);
+    overflow-y: auto;
+  }
+
+  .certv3-viewer {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    min-height: 52vh;
+  }
+
+  .certv3-sidebar {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 640px) {
   .certv3-overlay {
     padding: 0.6rem;
   }
@@ -1891,4 +1857,4 @@ section {
   .cursor-ring {
     display: none;
   }
-}
+} 

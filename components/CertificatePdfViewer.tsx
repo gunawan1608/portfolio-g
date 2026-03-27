@@ -29,13 +29,16 @@ function PdfSkeleton() {
           </div>
         </div>
       </div>
-      <p className="certv3-skeleton-label">Loading certificate...</p>
+      <p className="certv3-skeleton-label">Loading certificate…</p>
     </div>
   );
 }
 
 export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps) {
   const [loading, setLoading] = useState(true);
+
+  // #toolbar=0&navpanes=0 hides the browser PDF toolbar for a clean embed
+  const iframeSrc = `${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
 
   return (
     <div className="certv3-pdf-viewport">
@@ -46,7 +49,7 @@ export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps)
             className="certv3-skeleton-overlay"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
           >
             <PdfSkeleton />
           </motion.div>
@@ -57,12 +60,13 @@ export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps)
         className="certv3-pdf-doc-wrap"
         initial={{ opacity: 0 }}
         animate={{ opacity: loading ? 0 : 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <iframe
           className="certv3-pdf-frame"
-          src={`${url}#view=FitH`}
+          src={iframeSrc}
           title="Certificate PDF preview"
+          loading="eager"
           onLoad={() => setLoading(false)}
         />
       </motion.div>
