@@ -1,94 +1,193 @@
 "use client";
 
+import Image from "next/image";
 import type { CSSProperties } from "react";
-import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { startTransition, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import SectionIntro from "@/components/SectionIntro";
-import { projects } from "@/lib/site-data";
+import { projects, type ProjectEntry } from "@/lib/site-data";
 
-gsap.registerPlugin(ScrollTrigger);
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-// Icon map for tech tags
-const TECH_ICONS: Record<string, string> = {
-  "React": "⚛",
-  "Next.js": "▲",
-  "Laravel": "🔴",
-  "PHP": "🐘",
-  "Flutter": "💙",
-  "Python": "🐍",
-  "JavaScript": "JS",
-  "TypeScript": "TS",
-  "MySQL": "🗄",
-  "Dart": "🎯",
-  "C#": "◆",
-  "Godot": "🎮",
-};
-
-function ProjectCard({
-  project,
-  index,
-  featured,
-}: {
-  project: (typeof projects)[0];
-  index: number;
-  featured?: boolean;
-}) {
-  const cardRef = useRef<HTMLElement>(null);
+function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index: number }) {
+  const articleRef = useRef<HTMLElement>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const reducedMotion = useReducedMotion();
+  const activeImage = project.images[activeImageIndex] ?? project.images[0];
 
   const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["start end", "end start"],
+    target: articleRef,
+    offset: ["start 90%", "end 12%"],
   });
 
-  const previewY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const stageOffset = useTransform(
+    scrollYProgress,
+    [0, 1],
+    index % 2 === 0 ? [18, -18] : [-18, 18],
+  );
+
+  const stageGlowScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.97, 1.02, 0.99]);
+
+  const cardNumber = String(index + 1).padStart(2, "0");
 
   return (
     <motion.article
-      ref={cardRef}
-      className={`project-card${featured ? " project-card-featured" : ""}`}
+      ref={articleRef}
+      className={`project-showcase-card${index % 2 === 1 ? " is-reversed" : ""}`}
       style={{ "--project-accent": project.accent } as CSSProperties}
-      initial={{ opacity: 0, y: 48 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{
-        duration: 0.65,
-        delay: index * 0.07,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -10 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, delay: index * 0.08, ease: EASE }}
+      whileHover={reducedMotion ? undefined : { y: -4 }}
     >
-      {/* Preview area */}
-      <div className="project-preview">
-        <motion.div className="project-preview-inner" style={{ y: previewY }}>
-          <div className="project-preview-panel project-preview-panel-lg" />
-          <div className="project-preview-panel project-preview-panel-sm" />
-          <div className="project-preview-dots" aria-hidden>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i} className="project-preview-dot" />
-            ))}
+      <motion.div
+        className="project-showcase-stage"
+        style={reducedMotion ? undefined : { y: stageOffset }}
+      >
+        <div className="project-showcase-frame">
+          <div className="project-stage-toolbar" aria-hidden>
+            <div className="project-stage-dots">
+              <span className="project-stage-dot" />
+              <span className="project-stage-dot" />
+              <span className="project-stage-dot" />
+            </div>
+            <span className="project-stage-chip">{project.platform}</span>
           </div>
-        </motion.div>
-        <div className="project-preview-line" />
-        <span className="project-preview-status">{project.status}</span>
-      </div>
 
-      {/* Info */}
-      <div className="project-info">
-        <p className="project-category">{project.category}</p>
-        <h3 className="project-title">{project.title}</h3>
+          <motion.div
+            className="project-stage-glow"
+            style={reducedMotion ? undefined : { scale: stageGlowScale }}
+          />
+
+          <div className="project-stage-image-shell">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`${project.id}-${activeImageIndex}`}
+                className="project-stage-image-layer"
+                initial={reducedMotion ? false : { opacity: 0, scale: 0.98, y: 12 }}
+                animate={reducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+                exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.01, y: -8 }}
+                transition={{ duration: 0.42, ease: EASE }}
+              >
+                <Image
+                  src={activeImage.src}
+                  alt={activeImage.alt}
+                  fill
+                  className="project-stage-image"
+                  sizes="(max-width: 1100px) 100vw, 56vw"
+                  priority={index === 0 && activeImageIndex === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="project-stage-caption">
+          <div className="project-stage-caption-copy">
+            <span className="project-stage-caption-label">Selected Screen</span>
+            <strong>{activeImage.label}</strong>
+          </div>
+          <span className="project-stage-count">
+            {String(activeImageIndex + 1).padStart(2, "0")} / {String(project.images.length).padStart(2, "0")}
+          </span>
+        </div>
+
+        <div className="project-thumb-grid" aria-label={`${project.title} screens`}>
+          {project.images.map((image, imageIndex) => {
+            const isActive = imageIndex === activeImageIndex;
+
+            return (
+              <button
+                key={image.label}
+                type="button"
+                className={`project-thumb${isActive ? " is-active" : ""}`}
+                onClick={() => {
+                  if (imageIndex === activeImageIndex) {
+                    return;
+                  }
+
+                  startTransition(() => {
+                    setActiveImageIndex(imageIndex);
+                  });
+                }}
+                aria-pressed={isActive}
+                data-hover
+              >
+                <span className="project-thumb-frame">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    className="project-thumb-image"
+                    sizes="(max-width: 640px) 30vw, (max-width: 1100px) 28vw, 16vw"
+                  />
+                </span>
+                <span className="project-thumb-copy">
+                  <span className="project-thumb-index">{String(imageIndex + 1).padStart(2, "0")}</span>
+                  <span className="project-thumb-label">{image.label}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      <div className="project-showcase-body">
+        <div className="project-heading-row">
+          <div className="project-heading-copy">
+            <p className="project-kicker">
+              <span className="project-kicker-number">{cardNumber}</span>
+              <span>{project.category}</span>
+            </p>
+            <h3 className="project-title">{project.title}</h3>
+          </div>
+          <span className="project-status-pill">{project.status}</span>
+        </div>
+
+        <p className="project-platform">{project.platform}</p>
         <p className="project-summary">{project.summary}</p>
 
-        <div className="tag-group project-tags">
+        <div className="project-meta-grid">
+          <div className="project-meta-card">
+            <span className="project-meta-label">Type</span>
+            <strong>{project.category}</strong>
+          </div>
+          <div className="project-meta-card">
+            <span className="project-meta-label">Platform</span>
+            <strong>{project.platform}</strong>
+          </div>
+          <div className="project-meta-card">
+            <span className="project-meta-label">Preview</span>
+            <strong>{project.images.length} Screens</strong>
+          </div>
+        </div>
+
+        <div className="tag-group project-stack">
           {project.stack.map((item) => (
             <span key={item} className="tag">
-              {TECH_ICONS[item] && (
-                <span className="tag-icon" aria-hidden>{TECH_ICONS[item]}</span>
-              )}
               {item}
             </span>
           ))}
+        </div>
+
+        <div className="project-actions">
+          <a
+            className="button button-primary project-link"
+            href={project.href}
+            target="_blank"
+            rel="noreferrer"
+            data-hover
+          >
+            {project.hrefLabel}
+          </a>
+          <p className="project-link-note">Real screens included.</p>
         </div>
       </div>
     </motion.article>
@@ -96,63 +195,20 @@ function ProjectCard({
 }
 
 export default function ProjectsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-
-    const ctx = gsap.context(() => {
-      // Subtle section-wide parallax on the heading
-      gsap.fromTo(
-        headingRef.current,
-        { y: 0 },
-        {
-          y: -30,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "center top",
-            scrub: 1.5,
-          },
-        },
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  const featured = projects[0];
-  const rest = projects.slice(1);
-
   return (
-    <section id="projects" ref={sectionRef} className="section">
+    <section id="projects" className="section projects-section">
       <div className="container">
-        <div ref={headingRef}>
-          <SectionIntro
-            eyebrow="Projects"
-            title="Work I've built and shipped."
-            description="A curated selection of projects — from web apps to mobile builds. More coming soon."
-          />
+        <SectionIntro
+          eyebrow="Projects"
+          title="Things I've Built Along My Journey."
+          description="These projects represent my journey in building real applications, from simple ideas to functional systems."
+        />
+
+        <div className="project-showcase-list">
+          {projects.map((project, index) => (
+            <ProjectShowcaseCard key={project.id} project={project} index={index} />
+          ))}
         </div>
-
-        {/* Featured project row */}
-        {featured && (
-          <div className="project-featured-row">
-            <ProjectCard project={featured} index={0} featured />
-          </div>
-        )}
-
-        {/* Grid for remaining projects */}
-        {rest.length > 0 && (
-          <div className="project-grid-multi">
-            {rest.map((project, i) => (
-              <ProjectCard key={project.title} project={project} index={i + 1} />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );

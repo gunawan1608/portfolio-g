@@ -1,16 +1,41 @@
+import type { StaticImageData } from "next/image";
+import nightmareStartScreen from "@/assets/images/projects/Nightmare House/start_screen.png";
+import nightmareScene1 from "@/assets/images/projects/Nightmare House/scene1.png";
+import nightmareScene2 from "@/assets/images/projects/Nightmare House/scene2.png";
+import flexiConvertLanding from "@/assets/images/projects/FlexiConvert/landing_page.png";
+import flexiConvertLogin from "@/assets/images/projects/FlexiConvert/login_page.png";
+import flexiConvertConvert from "@/assets/images/projects/FlexiConvert/convert_to_pdf_page.png";
+import hospitalLoginLanding from "@/assets/images/projects/Hospital Management System/login & landing_page.png";
+import hospitalHome from "@/assets/images/projects/Hospital Management System/home_page.png";
+import hospitalPatient from "@/assets/images/projects/Hospital Management System/patient_page.png";
+import libraryLanding from "@/assets/images/projects/Sistem Perpustakaan/landing_pages.png";
+import libraryRegistration from "@/assets/images/projects/Sistem Perpustakaan/registration_pages.png";
+import libraryMain from "@/assets/images/projects/Sistem Perpustakaan/main_pages.png";
+
 export type SocialLink = {
   label: string;
   handle: string;
   href: string;
 };
 
+export type ProjectImageEntry = {
+  src: StaticImageData;
+  alt: string;
+  label: string;
+};
+
 export type ProjectEntry = {
+  id: string;
   category: string;
+  platform: string;
   title: string;
   summary: string;
   stack: string[];
   status: string;
   accent: string;
+  href: string;
+  hrefLabel: string;
+  images: ProjectImageEntry[];
 };
 
 export type SkillGroup = {
@@ -80,31 +105,124 @@ export const profile = {
 
 export const projects: ProjectEntry[] = [
   {
-    category: "Portfolio",
-    title: "Personal Portfolio Website",
+    id: "nightmare-house",
+    category: "Game Development",
+    platform: "Godot Engine",
+    title: "Nightmare House",
     summary:
-      "A personal website built to present my profile, selected work, certificates, and experience in a cleaner way.",
-    stack: ["Next.js", "TypeScript", "GSAP", "Framer Motion"],
-    status: "In progress",
-    accent: "#42a66a",
+      "A short horror game project built in Godot with scene-based tension, atmosphere-first presentation, and a focused gameplay loop.",
+    stack: ["Godot", "Game Design", "Level Flow"],
+    status: "Finished",
+    accent: "#2f8a57",
+    href: "https://skibidi-team.itch.io/nightmare-house",
+    hrefLabel: "Play on itch.io",
+    images: [
+      {
+        src: nightmareStartScreen,
+        alt: "Nightmare House start screen",
+        label: "Start Screen",
+      },
+      {
+        src: nightmareScene1,
+        alt: "Nightmare House gameplay scene one",
+        label: "Gameplay Scene 01",
+      },
+      {
+        src: nightmareScene2,
+        alt: "Nightmare House gameplay scene two",
+        label: "Gameplay Scene 02",
+      },
+    ],
   },
   {
-    category: "UI Study",
-    title: "Dashboard Interface Exploration",
+    id: "flexi-convert",
+    category: "Web Development",
+    platform: "Laravel & React",
+    title: "FlexiConvert",
     summary:
-      "A layout study focused on clean hierarchy, card composition, and readable data blocks.",
-    stack: ["UI Design", "Responsive Layout", "Interaction"],
-    status: "Concept",
-    accent: "#74c08d",
+      "A web-based conversion project focused on a cleaner user flow for authentication, landing experience, and document conversion actions.",
+    stack: ["Laravel", "React", "PHP", "JavaScript"],
+    status: "Finished",
+    accent: "#4f9f73",
+    href: "https://github.com/gunawan1608/flexi_convert",
+    hrefLabel: "View repository",
+    images: [
+      {
+        src: flexiConvertLanding,
+        alt: "FlexiConvert landing page",
+        label: "Landing Page",
+      },
+      {
+        src: flexiConvertLogin,
+        alt: "FlexiConvert login page",
+        label: "Login Page",
+      },
+      {
+        src: flexiConvertConvert,
+        alt: "FlexiConvert convert to PDF page",
+        label: "Convert to PDF",
+      },
+    ],
   },
   {
-    category: "Motion",
-    title: "Certificate Preview System",
+    id: "hospital-management-system",
+    category: "Desktop App Development",
+    platform: "C#",
+    title: "Hospital Management System",
     summary:
-      "A simple modal-based certificate preview prepared for adding real files later.",
-    stack: ["Modal", "Canvas", "Animation"],
-    status: "Ready",
-    accent: "#96d9aa",
+      "A desktop application designed to manage patient-related workflows, hospital records, and key operational screens in one interface.",
+    stack: ["C#", ".NET", "Desktop UI"],
+    status: "Finished",
+    accent: "#6eb58c",
+    href: "https://github.com/gunawan1608/hospital-management-system",
+    hrefLabel: "View repository",
+    images: [
+      {
+        src: hospitalLoginLanding,
+        alt: "Hospital Management System login and landing page",
+        label: "Login & Landing",
+      },
+      {
+        src: hospitalHome,
+        alt: "Hospital Management System home page",
+        label: "Home Dashboard",
+      },
+      {
+        src: hospitalPatient,
+        alt: "Hospital Management System patient page",
+        label: "Patient Page",
+      },
+    ],
+  },
+  {
+    id: "library-management-system",
+    category: "Web Development",
+    platform: "PHP",
+    title: "Library Management System",
+    summary:
+      "A PHP-based library system covering landing flow, user registration, and core management pages for everyday book and member handling.",
+    stack: ["PHP", "MySQL", "Web UI"],
+    status: "Finished",
+    accent: "#7ac497",
+    href: "https://github.com/gunawan1608/Sistem-Perpustakaan",
+    hrefLabel: "View repository",
+    images: [
+      {
+        src: libraryLanding,
+        alt: "Library Management System landing page",
+        label: "Landing Page",
+      },
+      {
+        src: libraryRegistration,
+        alt: "Library Management System registration page",
+        label: "Registration",
+      },
+      {
+        src: libraryMain,
+        alt: "Library Management System main page",
+        label: "Main Dashboard",
+      },
+    ],
   },
 ];
 
@@ -171,7 +289,7 @@ export const achievements: AchievementEntry[] = [
     title: "Job Roles in the Cloud",
     issuer: "AWS Training Online",
     receivedAt: "Jan 2024",
-    type: "Cloud",
+    type: "Training",
     note: "Certificate of completion covering cloud-focused job roles and foundational AWS learning.",
     accent: "#74c08d",
     skills: ["Cloud"],
@@ -183,7 +301,7 @@ export const achievements: AchievementEntry[] = [
     title: "Data Analytics untuk Siswa SMA/Sederajat",
     issuer: "Digital Talent Scholarship",
     receivedAt: "July 2024",
-    type: "Certificate",
+    type: "Training ",
     note: "Issued through Digital Talent Scholarship with a registered credential ID for verification.",
     accent: "#2f8a57",
     skills: ["Data Analyst"],
