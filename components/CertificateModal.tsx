@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { AchievementEntry } from "@/lib/site-data";
 
 type CertificateModalProps = {
@@ -16,19 +16,16 @@ export default function CertificateModal({
 }: CertificateModalProps) {
   const documentUrl = `/documents/${certificate.documentSlug}`;
   const [mounted, setMounted] = useState(false);
+  const [pdfLoaded, setPdfLoaded] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
-
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
@@ -37,89 +34,145 @@ export default function CertificateModal({
     };
   }, [onClose]);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return createPortal(
-    <motion.div
-      className="certificate-modal"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
-    >
+    <AnimatePresence>
       <motion.div
-        className="certificate-modal-card"
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 24, scale: 0.98 }}
-        transition={{ duration: 0.28 }}
+        className="certv2-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22 }}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        <div className="certificate-modal-head">
-          <div>
-            <p className="eyebrow">{certificate.type}</p>
-            <h3>{certificate.title}</h3>
+        <motion.div
+          className="certv2-shell"
+          initial={{ opacity: 0, y: 32, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.98 }}
+          transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {/* ── LEFT: PDF viewer ── */}
+          <div className="certv2-viewer">
+            {!pdfLoaded && (
+              <div className="certv2-skeleton">
+                <div className="certv2-skeleton-shimmer">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className="certv2-skeleton-line"
+                      style={{ width: `${60 + (i % 3) * 15}%`, animationDelay: `${i * 0.07}s` }}
+                    />
+                  ))}
+                </div>
+                <p className="certv2-skeleton-label">Loading document…</p>
+              </div>
+            )}
+            <iframe
+              className="certv2-iframe"
+              src={`${documentUrl}#view=FitH`}
+              title={`Certificate: ${certificate.title}`}
+              onLoad={() => setPdfLoaded(true)}
+              style={{ opacity: pdfLoaded ? 1 : 0 }}
+            />
           </div>
-          <div className="certificate-modal-actions">
-            <motion.a
-              href={documentUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="button button-primary button-compact"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              data-hover
-            >
-              Open PDF
-            </motion.a>
+
+          {/* ── RIGHT: sidebar ── */}
+          <div className="certv2-sidebar">
+            {/* close */}
             <button
               type="button"
-              className="button button-ghost button-compact"
+              className="certv2-close"
               onClick={onClose}
-              data-hover
+              aria-label="Close"
             >
-              Close
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
             </button>
-          </div>
-        </div>
 
-        <div className="certificate-modal-preview">
-          <iframe
-            className="certificate-pdf"
-            src={`${documentUrl}#view=FitH`}
-            title={`PDF preview for ${certificate.title}`}
-          />
-        </div>
+            <div className="certv2-sidebar-inner">
+              {/* type badge */}
+              <span
+                className="certv2-type-badge"
+                style={{ borderColor: certificate.accent, color: certificate.accent }}
+              >
+                {certificate.type}
+              </span>
 
-        <div className="certificate-meta-grid">
-          <div>
-            <span>Issuer</span>
-            <strong>{certificate.issuer}</strong>
-          </div>
-          <div>
-            <span>Received</span>
-            <strong>{certificate.receivedAt}</strong>
-          </div>
-          <div>
-            <span>Skills</span>
-            <strong>{certificate.skills.join(", ")}</strong>
-          </div>
-          {certificate.credentialId ? (
-            <div>
-              <span>Credential ID</span>
-              <strong>{certificate.credentialId}</strong>
+              {/* title — large editorial */}
+              <h2 className="certv2-title">{certificate.title}</h2>
+
+              {/* accent rule */}
+              <div
+                className="certv2-accent-rule"
+                style={{ background: certificate.accent }}
+              />
+
+              {/* meta stack */}
+              <dl className="certv2-meta">
+                <div className="certv2-meta-row">
+                  <dt>Issued by</dt>
+                  <dd>{certificate.issuer}</dd>
+                </div>
+                <div className="certv2-meta-row">
+                  <dt>Date</dt>
+                  <dd>{certificate.receivedAt}</dd>
+                </div>
+                {certificate.credentialId && (
+                  <div className="certv2-meta-row">
+                    <dt>Credential ID</dt>
+                    <dd className="certv2-credential">{certificate.credentialId}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {/* skills */}
+              <div className="certv2-skills-block">
+                <p className="certv2-skills-label">Skills covered</p>
+                <div className="certv2-chips">
+                  {certificate.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="certv2-chip"
+                      style={{
+                        background: `${certificate.accent}10`,
+                        borderColor: `${certificate.accent}28`,
+                        color: certificate.accent,
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* note */}
+              {certificate.note && (
+                <p className="certv2-note">{certificate.note}</p>
+              )}
+
+              {/* CTA */}
+              <a
+                href={documentUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="certv2-open-btn"
+                style={{
+                  background: certificate.accent,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                  <path d="M2 12L12 2M12 2H6M12 2v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Open full PDF
+              </a>
             </div>
-          ) : null}
-        </div>
-
-        <p className="certificate-note">{certificate.note}</p>
+          </div>
+        </motion.div>
       </motion.div>
-    </motion.div>,
+    </AnimatePresence>,
     document.body,
   );
 }
