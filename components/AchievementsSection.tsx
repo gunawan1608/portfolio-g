@@ -7,7 +7,6 @@ import CertificateModal from "@/components/CertificateModal";
 import SectionIntro from "@/components/SectionIntro";
 import { achievements, type AchievementEntry } from "@/lib/site-data";
 
-// A simple sparkle/cert icon rendered via inline SVG
 function CertIcon({ accent }: { accent: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
@@ -49,8 +48,7 @@ export default function AchievementsSection() {
                   whileHover={{ y: -5 }}
                   data-hover
                 >
-                  {/* Top accent strip */}
-                  <div className="achievement-strip" />
+                  {/* NO top accent strip — removed */}
 
                   {/* Header row */}
                   <div className="achievement-card-header">
