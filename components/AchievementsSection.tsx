@@ -27,8 +27,8 @@ export default function AchievementsSection() {
         <div className="container">
           <SectionIntro
             eyebrow="Achievement"
-            title="Certificates backed by the original PDF documents."
-            description="Each card opens the real certificate file with its details, key skills, and a readable PDF preview."
+            title="Training & Certifications."
+            description="Certifications earned through training programs, reflecting my continuous growth and dedication in learning technology."
           />
 
           <div className="achievement-grid">
