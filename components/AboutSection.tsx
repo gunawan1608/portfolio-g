@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import SectionIntro from "@/components/SectionIntro";
+import AboutIdentityCard from "@/components/AboutIdentityCard";
 import { profile } from "@/lib/site-data";
 
 export default function AboutSection() {
@@ -10,8 +11,8 @@ export default function AboutSection() {
       <div className="container">
         <SectionIntro
           eyebrow="About Me"
-          title="A short introduction about the way I work."
-          description="I prefer clean presentation, clear structure, and small details that make a page feel more complete."
+          title="A little about me and the way I build things."
+          description="I value clarity, thoughtful structure, and subtle details that bring everything together."
         />
 
         <div className="about-grid">
@@ -40,6 +41,8 @@ export default function AboutSection() {
             </ul>
           </motion.article>
         </div>
+
+        <AboutIdentityCard />
       </div>
     </section>
   );

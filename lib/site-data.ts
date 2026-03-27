@@ -18,6 +18,25 @@ export type SocialLink = {
   href: string;
 };
 
+export type IdentityCardField = {
+  label: string;
+  value: string;
+  fullWidth?: boolean;
+};
+
+export type IdentityCardData = {
+  label: string;
+  serial: string;
+  issuedBy: string;
+  cityLabel: string;
+  cityCoordinates: [number, number];
+  bounds: {
+    southWest: [number, number];
+    northEast: [number, number];
+  };
+  fields: IdentityCardField[];
+};
+
 export type ProjectImageEntry = {
   src: StaticImageData;
   alt: string;
@@ -77,13 +96,36 @@ export const profile = {
   shortBio:
     "This portfolio is still growing and will be filled step by step with real projects, experience, and certificates.",
   about:
-    "I enjoy building interfaces that feel clear, calm, and polished. My focus is frontend development, but I also care about structure, rhythm, and the final presentation of a page.",
+    "I'm currently in my final year of vocational high school, focusing on software engineering. Right now, I'm actively learning, building projects, and preparing myself for the next step in my journey as a developer.",
   focus: [
     "Learning Laravel Framework",
     "Developing Personal Portfolio",
     "Building Real-World Projects",
   ],
   email: "tamagunawan08@gmail.com",
+  identityCard: {
+    label: "Identity Card",
+    serial: "ID / GM-160108 / JKT",
+    issuedBy: "About Me Showcase",
+    cityLabel: "Jakarta, Indonesia",
+    cityCoordinates: [-6.2088, 106.8456] as [number, number],
+    bounds: {
+      southWest: [-11.2, 94.2] as [number, number],
+      northEast: [6.3, 141.2] as [number, number],
+    },
+    fields: [
+      { label: "Name", value: "Gunawan Madia Pratama", fullWidth: true },
+      { label: "Gender", value: "Male" },
+      { label: "Date of Birth", value: "16 January 2008" },
+      { label: "Location", value: "Jakarta, Indonesia" },
+      { label: "Role", value: "Software Engineering Student" },
+      {
+        label: "Status",
+        value: "Final-year student, State Vocational High School 1 Jakarta",
+        fullWidth: true,
+      },
+    ] satisfies IdentityCardField[],
+  } satisfies IdentityCardData,
   socials: [
     {
       label: "GitHub",
