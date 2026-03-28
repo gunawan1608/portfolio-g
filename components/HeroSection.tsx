@@ -9,9 +9,9 @@ import portraitImage from "@/assets/images/portofolio_img.png";
 import { scrollToSection } from "@/lib/navigation";
 import { profile } from "@/lib/site-data";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger); 
 
-const ROLE_LABEL = "Software Developer";
+const ROLE_LABEL = "Software Engineering Student";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);

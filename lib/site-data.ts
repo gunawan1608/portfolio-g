@@ -89,7 +89,7 @@ export type AchievementEntry = {
 export const profile = {
   name: "Gunawan Madia Pratama",
   initials: "GM",
-  role: "Software Developer",
+  role: "Software Engineering Student",
   location: "Indonesia",
   intro:
     "I build clean websites with thoughtful motion, responsive layouts, and a strong focus on detail.",
