@@ -89,8 +89,8 @@ export default function AboutIdentityCard() {
       });
       mapInstanceRef.current = map;
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd", minZoom: 3, maxZoom: 8,
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}", {
+        minZoom: 3, maxZoom: 8,
       }).addTo(map);
 
       const bounds = L.latLngBounds(id.bounds.southWest, id.bounds.northEast);
@@ -151,7 +151,6 @@ export default function AboutIdentityCard() {
 
   return (
     <div className="idlauncher-root">
-      {/* ─── LAUNCHER SECTION ─── */}
       <motion.div
         className="idlauncher-wrap"
         initial={{ opacity: 0, y: 24 }}
@@ -159,7 +158,6 @@ export default function AboutIdentityCard() {
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.6, ease: EASE }}
       >
-        {/* Left text */}
         <div className="idlauncher-text">
           <span className="idlauncher-eyebrow">Personal</span>
           <h3 className="idlauncher-heading">Identity<br/>Card</h3>
@@ -182,7 +180,6 @@ export default function AboutIdentityCard() {
           </motion.button>
         </div>
 
-        {/* Right — floating card preview */}
         <div className="idlauncher-preview-area" aria-hidden>
           <div className="idlauncher-card-stack">
             <div className="idlauncher-card-back-deco" />
@@ -212,18 +209,10 @@ export default function AboutIdentityCard() {
               </div>
             </div>
           </div>
-          {/* Floating tags */}
-          <div className="idl-tag idl-tag-1">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#2f8a57" fillOpacity="0.8"/></svg>
-            Jakarta
-          </div>
-          <div className="idl-tag idl-tag-2">
-            🪪 Digital ID
-          </div>
+          <div className="idl-tag idl-tag-2">🪪 Digital ID</div>
         </div>
       </motion.div>
 
-      {/* ─── MODAL ─── */}
       {isMounted ? createPortal(
         <AnimatePresence>
           {isOpen ? (
@@ -276,25 +265,20 @@ export default function AboutIdentityCard() {
                       transition={{ duration: reducedMotion ? 0.01 : 0.82, ease: EASE }}
                     >
 
-                      {/* ══ FRONT FACE ══ */}
+                      {/* ══ FRONT ══ */}
                       <article className="idcard-face idcard-face-front">
-                        {/* subtle crosshatch BG */}
                         <div className="idcf-bg-pattern" aria-hidden />
-                        {/* Indonesia silhouette watermark */}
                         <div className="idcf-map-wm" aria-hidden>
                           <svg viewBox="0 0 300 100" fill="none">
                             <path d="M8 42 Q18 34 34 37 Q44 32 56 36 Q68 31 82 35 Q96 30 112 34 Q126 29 142 33 Q156 28 172 33 Q184 30 196 35 Q208 32 222 37 Q234 34 248 40 Q258 44 252 50 Q240 46 226 50 Q212 46 198 50 Q184 46 170 50 Q156 46 142 50 Q128 46 114 50 Q100 46 86 50 Q72 46 58 50 Q44 46 34 52 Q22 49 12 54 Q4 50 8 42Z" fill="currentColor" fillOpacity="0.055"/>
                             <path d="M258 48 Q270 44 284 48 Q292 52 287 57 Q275 54 264 57 Q255 54 258 48Z" fill="currentColor" fillOpacity="0.045"/>
-                            <path d="M18 56 Q32 52 48 55 Q60 52 72 55 Q84 52 96 55 Q108 52 118 56 Q112 61 100 58 Q88 61 76 58 Q64 61 52 58 Q40 61 28 58 Q18 60 18 56Z" fill="currentColor" fillOpacity="0.038"/>
                           </svg>
                         </div>
 
-                        {/* Header */}
                         <div className="idcf-header">
                           <div className="idcf-flag"><span /><span /></div>
                           <div className="idcf-header-copy">
-                            <span className="idcf-card-type">IDENTITY CARD</span>
-                            <span className="idcf-province">{id.cityLabel ?? "DKI Jakarta · Indonesia"}</span>
+                            <span className="idcf-card-type">Identity Card</span>
                           </div>
                           <div className="idcf-emblem" aria-hidden>
                             <svg viewBox="0 0 40 40" fill="none">
@@ -305,9 +289,24 @@ export default function AboutIdentityCard() {
                           </div>
                         </div>
 
-                        {/* Body */}
+                        {/* KTP body: fields left + photo right */}
                         <div className="idcf-body">
-                          {/* Photo */}
+                          <div className="idcf-fields-col">
+                            <div className="idcf-field-row idcf-nik-row">
+                              <span className="idcf-fl">Identity Number</span>
+                              <span className="idcf-sep">:</span>
+                              <span className="idcf-nik-val">{id.serial}</span>
+                            </div>
+                            <div className="idcf-rule" />
+                            {fields.map((f) => (
+                              <div key={f.label} className="idcf-field-row">
+                                <span className="idcf-fl">{f.label}</span>
+                                <span className="idcf-sep">:</span>
+                                <span className="idcf-fv">{f.value}</span>
+                              </div>
+                            ))}
+                          </div>
+
                           <div className="idcf-photo-col">
                             <div className="idcf-photo-frame">
                               <Image
@@ -315,59 +314,28 @@ export default function AboutIdentityCard() {
                                 alt={`Portrait of ${profile.name}`}
                                 fill
                                 className="idcf-photo-img"
-                                sizes="160px"
+                                sizes="(max-width: 640px) 92px, 112px"
                                 priority
                               />
                             </div>
-                            <span className="idcf-serial">{id.serial ?? "ID-2024-001"}</span>
-                          </div>
-
-                          {/* Fields */}
-                          <div className="idcf-fields">
-                            <div className="idcf-name-block">
-                              <span className="idcf-fl">Full Name</span>
-                              <strong className="idcf-name">{profile.name}</strong>
-                            </div>
-
-                            <div className="idcf-rule" />
-
-                            <div className="idcf-field-grid">
-                              {fields.slice(0, 4).map((f) => (
-                                <div key={f.label} className="idcf-field">
-                                  <span className="idcf-fl">{f.label}</span>
-                                  <strong className="idcf-fv">{f.value}</strong>
-                                </div>
-                              ))}
-                              <div className="idcf-field">
-                                <span className="idcf-fl">Role</span>
-                                <strong className="idcf-fv">{profile.role}</strong>
-                              </div>
-                              {fields.slice(4).map((f) => (
-                                <div key={f.label} className="idcf-field">
-                                  <span className="idcf-fl">{f.label}</span>
-                                  <strong className="idcf-fv">{f.value}</strong>
-                                </div>
-                              ))}
+                            <div className="idcf-photo-caption">
+                              <span>Jakarta, Indonesia</span>
+                              <span>28 March 2026</span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Footer */}
                         <div className="idcf-footer">
                           <div className="idcf-barcode" aria-hidden>
                             {[2,1,3,1,2,1,1,2,3,1,2,1,1,3,2,1,2,1,3,1,1,2,1,3,2,1].map((w,i)=>(
                               <span key={i} style={{width:`${w}px`}}/>
                             ))}
                           </div>
-                          <span className="idcf-footer-txt">{id.serial ?? "ID-2024-001"}</span>
-                          {/* Smart chip icon */}
-                          <div className="idcf-chip" aria-hidden>
-                            <span/><span/><span/>
-                          </div>
+                          <div className="idcf-chip" aria-hidden><span/><span/><span/></div>
                         </div>
                       </article>
 
-                      {/* ══ BACK FACE ══ */}
+                      {/* ══ BACK ══ */}
                       <article className="idcard-face idcard-face-back">
                         <div className="idcb-bg-pattern" aria-hidden />
 
@@ -375,7 +343,6 @@ export default function AboutIdentityCard() {
                           <div className="idcf-flag"><span /><span /></div>
                           <div className="idcb-header-copy">
                             <span className="idcb-card-type">IDENTITY CARD</span>
-                            <span className="idcb-sub">Location Map</span>
                           </div>
                           <span className={`idcb-status ${isMapReady ? "is-ready" : ""}`}>
                             {isMapReady ? "● Live" : "● Loading"}
@@ -389,21 +356,10 @@ export default function AboutIdentityCard() {
                               <div className="idcb-loading-ring" />
                             </div>
                           )}
-                          <div className="idcb-vignette" aria-hidden />
-                          <div className="idcb-pin-badge">
-                            <svg width="9" height="12" viewBox="0 0 9 12" fill="none" aria-hidden>
-                              <path d="M4.5 0C2.01 0 0 2.01 0 4.5c0 3.375 4.5 7.5 4.5 7.5S9 7.875 9 4.5C9 2.01 6.99 0 4.5 0zm0 6.375A1.875 1.875 0 1 1 4.5 2.625a1.875 1.875 0 0 1 0 3.75z" fill="currentColor"/>
-                            </svg>
-                            <div>
-                              <span>{id.cityLabel}</span>
-                              <strong>Indonesia</strong>
-                            </div>
-                          </div>
+                          <div className="idcb-vignette" aria-hidden /> 
                         </div>
 
                         <div className="idcb-footer">
-                          <span className="idcb-coords">{coordsLabel}</span>
-                          <span className="idcb-owner">{profile.name}</span>
                         </div>
                       </article>
 
