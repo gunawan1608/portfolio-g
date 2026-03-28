@@ -2417,6 +2417,704 @@ section {
 }
 
 /* ─── Contact ─────────────────────────────────────────────────── */
+@keyframes experienceRadarPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.56;
+  }
+
+  50% {
+    transform: scale(1.06);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.56;
+  }
+}
+
+@keyframes experienceDotFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.experience-section {
+  overflow: clip;
+}
+
+.experience-section-aura {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(6px);
+}
+
+.experience-section-aura.is-one {
+  top: 6rem;
+  right: -7rem;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(circle, rgba(116, 192, 141, 0.26) 0%, transparent 68%);
+}
+
+.experience-section-aura.is-two {
+  left: -5rem;
+  bottom: 2rem;
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(circle, rgba(47, 138, 87, 0.16) 0%, transparent 70%);
+}
+
+.experience-journey-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.experience-overview-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.05rem 1.15rem 1.1rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+}
+
+.experience-overview-card::before {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 0;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(116, 192, 141, 0.2) 0%, transparent 72%);
+  transform: translate(-30%, 30%);
+  pointer-events: none;
+}
+
+.experience-overview-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.experience-overview-value {
+  display: block;
+  margin-top: 0.45rem;
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+}
+
+.experience-overview-copy {
+  margin-top: 0.28rem;
+  max-width: 25ch;
+  color: var(--text-muted);
+}
+
+.experience-journey-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.94fr) minmax(0, 1.16fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.experience-hud {
+  position: sticky;
+  top: 118px;
+}
+
+.experience-hud-frame {
+  --experience-accent: var(--green);
+  position: relative;
+  overflow: hidden;
+  padding: 1.45rem;
+  border-radius: 36px;
+  border: 1px solid color-mix(in srgb, var(--experience-accent) 18%, rgba(255, 255, 255, 0.92));
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(223, 243, 228, 0.78));
+  box-shadow: var(--shadow-lg);
+}
+
+.experience-hud-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--experience-accent) 24%, transparent) 0%, transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 42%);
+  pointer-events: none;
+}
+
+.experience-hud-frame::after {
+  content: "";
+  position: absolute;
+  inset: 1rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  pointer-events: none;
+}
+
+.experience-hud-head,
+.experience-hud-radar-shell,
+.experience-hud-stats,
+.experience-hud-progress,
+.experience-hud-highlights,
+.experience-hud-tip {
+  position: relative;
+  z-index: 1;
+}
+
+.experience-hud-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.experience-hud-kicker {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.experience-hud-head h3 {
+  margin-top: 0.5rem;
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 4vw, 3.35rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  font-weight: 400;
+}
+
+.experience-hud-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.54rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--experience-accent) 26%, rgba(255, 255, 255, 0.92));
+  background: color-mix(in srgb, var(--experience-accent) 12%, rgba(255, 255, 255, 0.94));
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--experience-accent) 76%, #173223);
+}
+
+.experience-hud-radar-shell {
+  display: grid;
+  grid-template-columns: minmax(150px, 170px) minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: center;
+  margin-top: 1.3rem;
+}
+
+.experience-hud-radar {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.94) 0%, rgba(223, 243, 228, 0.54) 48%, transparent 100%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--experience-accent) 12%, transparent) 0%, transparent 72%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.34),
+    0 18px 34px rgba(41, 81, 53, 0.08);
+}
+
+.experience-hud-radar-ring,
+.experience-hud-radar-ping {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.experience-hud-radar-ring {
+  border: 1px dashed color-mix(in srgb, var(--experience-accent) 38%, rgba(255, 255, 255, 0.65));
+  animation: experienceRadarPulse 7s ease-in-out infinite;
+}
+
+.experience-hud-radar-ring.is-outer {
+  inset: 12%;
+}
+
+.experience-hud-radar-ring.is-middle {
+  inset: 25%;
+  animation-duration: 5.6s;
+  animation-direction: reverse;
+}
+
+.experience-hud-radar-ring.is-inner {
+  inset: 38%;
+  border-style: solid;
+  animation-duration: 4.4s;
+}
+
+.experience-hud-radar-ping {
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  margin-top: -7px;
+  background: var(--experience-accent);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--experience-accent) 18%, transparent);
+}
+
+.experience-hud-radar-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.experience-hud-radar-center span {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.experience-hud-radar-center strong {
+  font-family: var(--display);
+  font-size: clamp(2.1rem, 4vw, 3rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+}
+
+.experience-hud-copy {
+  min-height: 0;
+}
+
+.experience-hud-type {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--experience-accent) 70%, #395845);
+}
+
+.experience-hud-copy h4 {
+  margin-top: 0.5rem;
+  font-family: var(--display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+}
+
+.experience-hud-location {
+  margin-top: 0.4rem;
+  color: var(--text-muted);
+}
+
+.experience-hud-summary {
+  margin-top: 0.85rem;
+  color: var(--text-soft);
+}
+
+.experience-hud-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+}
+
+.experience-hud-stat {
+  padding: 0.9rem 0.95rem;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm);
+}
+
+.experience-hud-stat span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.experience-hud-stat strong {
+  display: block;
+  margin-top: 0.42rem;
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
+
+.experience-hud-progress {
+  margin-top: 1rem;
+  padding: 1rem 1rem 1.05rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: var(--shadow-sm);
+}
+
+.experience-hud-progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.experience-hud-progress-track {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.85rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: rgba(23, 50, 35, 0.08);
+}
+
+.experience-hud-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--experience-accent) 84%, #ffffff), var(--experience-accent));
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--experience-accent) 24%, transparent);
+}
+
+.experience-hud-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.experience-hud-highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.78rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--experience-accent) 18%, rgba(255, 255, 255, 0.92));
+  background: color-mix(in srgb, var(--experience-accent) 10%, rgba(255, 255, 255, 0.9));
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--experience-accent) 78%, #173223);
+}
+
+.experience-hud-tip {
+  margin-top: 1rem;
+  color: var(--text-muted);
+}
+
+.experience-journey-rail {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.experience-checkpoint {
+  --experience-accent: var(--green);
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  text-align: left;
+  cursor: pointer;
+}
+
+.experience-checkpoint::after {
+  content: "";
+  position: absolute;
+  left: 41px;
+  top: 72px;
+  bottom: -22px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--experience-accent) 42%, rgba(191, 211, 195, 0.48)),
+    rgba(191, 211, 195, 0.3)
+  );
+  pointer-events: none;
+}
+
+.experience-checkpoint.is-last::after {
+  display: none;
+}
+
+.experience-checkpoint-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding-top: 0.45rem;
+}
+
+.experience-checkpoint-stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.45rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.72);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-ink);
+  transition:
+    background-color 0.24s var(--ease-out),
+    border-color 0.24s var(--ease-out),
+    color 0.24s var(--ease-out);
+}
+
+.experience-checkpoint-dot {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--experience-accent) 28%, rgba(255, 255, 255, 0.88));
+  background: color-mix(in srgb, var(--experience-accent) 18%, #ffffff);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--experience-accent) 10%, transparent);
+  animation: experienceDotFloat 4.8s ease-in-out infinite;
+  transition:
+    transform 0.24s var(--ease-out),
+    box-shadow 0.24s var(--ease-out);
+}
+
+.experience-checkpoint-dot-core {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--experience-accent);
+}
+
+.experience-checkpoint-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem 1.4rem;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.94), rgba(247, 251, 246, 0.84));
+  box-shadow: var(--shadow-md);
+  transition:
+    transform 0.28s var(--ease-out),
+    box-shadow 0.28s var(--ease-out),
+    border-color 0.28s var(--ease-out),
+    background-color 0.28s var(--ease-out);
+}
+
+.experience-checkpoint-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--experience-accent) 20%, transparent) 0%, transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 28%);
+  pointer-events: none;
+}
+
+.experience-checkpoint:hover .experience-checkpoint-card,
+.experience-checkpoint.is-active .experience-checkpoint-card {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--experience-accent) 26%, rgba(255, 255, 255, 0.92));
+  box-shadow: var(--shadow-lg);
+}
+
+.experience-checkpoint:hover .experience-checkpoint-stage,
+.experience-checkpoint.is-active .experience-checkpoint-stage {
+  border-color: color-mix(in srgb, var(--experience-accent) 28%, rgba(255, 255, 255, 0.92));
+  background: color-mix(in srgb, var(--experience-accent) 12%, rgba(255, 255, 255, 0.94));
+  color: color-mix(in srgb, var(--experience-accent) 76%, #173223);
+}
+
+.experience-checkpoint:hover .experience-checkpoint-dot,
+.experience-checkpoint.is-active .experience-checkpoint-dot {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 12px color-mix(in srgb, var(--experience-accent) 14%, transparent);
+}
+
+.experience-checkpoint-top,
+.experience-checkpoint-head,
+.experience-checkpoint-special-row {
+  position: relative;
+  z-index: 1;
+}
+
+.experience-checkpoint-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.experience-checkpoint-type,
+.experience-checkpoint-period,
+.experience-checkpoint-status,
+.experience-checkpoint-duration,
+.experience-checkpoint-tag,
+.experience-checkpoint-special-row {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.experience-checkpoint-type {
+  color: color-mix(in srgb, var(--experience-accent) 72%, #395845);
+}
+
+.experience-checkpoint-period {
+  color: var(--text-muted);
+}
+
+.experience-checkpoint-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 0.95rem;
+}
+
+.experience-checkpoint-head h3 {
+  max-width: 16ch;
+  font-family: var(--display);
+  font-size: clamp(1.75rem, 2.6vw, 2.3rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+}
+
+.experience-checkpoint-location {
+  margin-top: 0.38rem;
+  color: var(--text-muted);
+}
+
+.experience-checkpoint-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.experience-checkpoint-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.48rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--experience-accent) 18%, rgba(255, 255, 255, 0.92));
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-soft);
+}
+
+.experience-checkpoint-duration {
+  color: var(--text-faint);
+}
+
+.experience-checkpoint-summary {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.85rem;
+  max-width: 56ch;
+  color: var(--text-soft);
+}
+
+.experience-checkpoint-tags {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.experience-checkpoint-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.52rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--text-soft);
+}
+
+.experience-checkpoint-special-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed color-mix(in srgb, var(--experience-accent) 22%, rgba(191, 211, 195, 0.6));
+  color: #8a621f;
+}
+
+.experience-checkpoint-special-row strong {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  font-weight: 500;
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-stage {
+  border-color: rgba(224, 170, 74, 0.38);
+  background: rgba(255, 247, 225, 0.92);
+  color: #8a621f;
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-dot {
+  border-color: rgba(224, 170, 74, 0.5);
+  background: rgba(255, 241, 205, 0.96);
+  box-shadow: 0 0 0 8px rgba(224, 170, 74, 0.12);
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-dot-core {
+  background: linear-gradient(135deg, #f0bf62 0%, #d4902f 100%);
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-card {
+  border-color: rgba(224, 170, 74, 0.38);
+  background: linear-gradient(165deg, rgba(255, 250, 236, 0.97), rgba(246, 249, 239, 0.92));
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-card::before {
+  background:
+    radial-gradient(circle at top right, rgba(224, 170, 74, 0.28) 0%, transparent 44%),
+    radial-gradient(circle at bottom left, rgba(116, 192, 141, 0.12) 0%, transparent 42%);
+}
+
+.experience-checkpoint.is-special .experience-checkpoint-type {
+  color: #8a621f;
+}
+
 .contact-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
@@ -2965,6 +3663,14 @@ section {
   .about-identity-panel-shell {
     grid-template-columns: 1fr;
   }
+
+  .experience-journey-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-hud {
+    position: static;
+  }
 }
 
 @media (max-width: 860px) {
@@ -3056,6 +3762,35 @@ section {
 
   .site-footer-shell {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .experience-journey-overview,
+  .experience-hud-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-hud-radar-shell,
+  .experience-checkpoint {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-checkpoint::after {
+    left: 20px;
+    top: 94px;
+  }
+
+  .experience-checkpoint-rail {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .experience-checkpoint-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .experience-checkpoint-meta {
     align-items: flex-start;
   }
 }
@@ -3192,6 +3927,35 @@ section {
 
   .achievement-grid {
     grid-template-columns: 1fr;
+  }
+
+  .experience-hud-frame,
+  .experience-checkpoint-card {
+    padding: 1.05rem;
+    border-radius: 26px;
+  }
+
+  .experience-overview-card {
+    padding: 0.95rem 1rem;
+  }
+
+  .experience-hud-radar-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-hud-radar {
+    width: min(100%, 180px);
+    margin: 0 auto;
+  }
+
+  .experience-checkpoint-top,
+  .experience-checkpoint-special-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .experience-checkpoint-head h3 {
+    max-width: none;
   }
 }
 

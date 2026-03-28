@@ -65,11 +65,20 @@ export type SkillGroup = {
 };
 
 export type ExperienceEntry = {
+  id: string;
+  stage: string;
   title: string;
-  organization: string;
+  location: string;
   period: string;
+  duration: string;
+  years: number;
   summary: string;
   type: string;
+  status: string;
+  theme: string;
+  highlights: string[];
+  accent: string;
+  special?: boolean;
 };
 
 export type AchievementEntry = {
@@ -291,27 +300,72 @@ export const skillGroups: SkillGroup[] = [
 
 export const experiences: ExperienceEntry[] = [
   {
-    title: "Education",
-    organization: "School details will be added here later",
-    period: "Year - Year",
-    summary: "A place to show my education background clearly and briefly.",
+    id: "karet-04-public-elementary-school",
+    stage: "LVL 01",
+    title: "Karet 04 Public Elementary School, Jakarta",
+    location: "Jakarta, Indonesia",
+    period: "2014 - 2020",
+    duration: "6 Years",
+    years: 6,
+    summary:
+      "The starting point of my academic journey and the first foundation that shaped how I learn, grow, and stay curious.",
     type: "Education",
+    status: "Completed",
+    theme: "Foundation",
+    highlights: ["Early journey", "Learning basics", "Jakarta"],
+    accent: "#2f8a57",
   },
   {
-    title: "Internship",
-    organization: "Company details will be added here later",
-    period: "Month Year - Month Year",
-    summary: "A place to show internship experience, work scope, and learning outcomes.",
-    type: "Internship",
+    id: "public-junior-high-school-58-jakarta",
+    stage: "LVL 02",
+    title: "Public Junior High School 58, Jakarta",
+    location: "Jakarta, Indonesia",
+    period: "2020 - 2023",
+    duration: "3 Years",
+    years: 3,
+    summary:
+      "A transition stage where discipline, consistency, and a stronger learning rhythm became a much bigger part of the journey.",
+    type: "Education",
+    status: "Completed",
+    theme: "Momentum",
+    highlights: ["Growth phase", "Consistency", "Next step"],
+    accent: "#4f9f73",
   },
   {
-    title: "Personal Practice",
-    organization: "Independent learning and personal projects",
-    period: "Ongoing",
-    summary: "A space for projects and continuous self-improvement outside formal work.",
-    type: "Practice",
+    id: "state-vocational-high-school-1-jakarta",
+    stage: "LVL 03",
+    title: "State Vocational High School 1 Jakarta",
+    location: "Software Engineering Track",
+    period: "2023 - 2026",
+    duration: "3 Years",
+    years: 3,
+    summary:
+      "My main software engineering chapter, focused on projects, technical growth, and preparing for the leap into real professional work.",
+    type: "Education",
+    status: "Current",
+    theme: "Software Engineering",
+    highlights: ["RPL track", "Project building", "Career prep"],
+    accent: "#74c08d",
   },
 ];
+
+export const featuredExperience: ExperienceEntry = {
+  id: "bsn-internship",
+  stage: "BONUS",
+  title: "National Standardization Agency of Indonesia (BSN)",
+  location: "Special Internship Chapter",
+  period: "2026",
+  duration: "Special Milestone",
+  years: 0,
+  summary:
+    "A special experience in the journey that marks the move from school-based growth into a real professional environment through internship.",
+  type: "Internship",
+  status: "Special Unlock",
+  theme: "Professional Chapter",
+  highlights: ["BSN", "Internship", "2026"],
+  accent: "#e0aa4a",
+  special: true,
+};
 
 export const achievements: AchievementEntry[] = [
   {
