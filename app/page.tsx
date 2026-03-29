@@ -31,13 +31,9 @@ export default function Home() {
           <AboutSection />
         </ScrollAnimWrapper>
 
-        <ScrollAnimWrapper delay={0.05}>
-          <AchievementsSection />
-        </ScrollAnimWrapper>
+        <AchievementsSection />
 
-        <ScrollAnimWrapper>
-          <ExperienceSection />
-        </ScrollAnimWrapper>
+        <ExperienceSection />
 
         <ScrollAnimWrapper delay={0.05}>
           <ContactSection />

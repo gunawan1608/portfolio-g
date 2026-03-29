@@ -2,13 +2,11 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { startTransition, useRef, useState } from "react";
+import { startTransition, useState } from "react";
 import {
   AnimatePresence,
   motion,
   useReducedMotion,
-  useScroll,
-  useTransform,
 } from "framer-motion";
 import SectionIntro from "@/components/SectionIntro";
 import { projects, type ProjectEntry } from "@/lib/site-data";
@@ -16,29 +14,14 @@ import { projects, type ProjectEntry } from "@/lib/site-data";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index: number }) {
-  const articleRef = useRef<HTMLElement>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const reducedMotion = useReducedMotion();
   const activeImage = project.images[activeImageIndex] ?? project.images[0];
-
-  const { scrollYProgress } = useScroll({
-    target: articleRef,
-    offset: ["start 90%", "end 12%"],
-  });
-
-  const stageOffset = useTransform(
-    scrollYProgress,
-    [0, 1],
-    index % 2 === 0 ? [18, -18] : [-18, 18],
-  );
-
-  const stageGlowScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.97, 1.02, 0.99]);
 
   const cardNumber = String(index + 1).padStart(2, "0");
 
   return (
     <motion.article
-      ref={articleRef}
       className={`project-showcase-card${index % 2 === 1 ? " is-reversed" : ""}`}
       style={{ "--project-accent": project.accent } as CSSProperties}
       initial={{ opacity: 0, y: 40 }}
@@ -47,10 +30,7 @@ function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index:
       transition={{ duration: 0.7, delay: index * 0.08, ease: EASE }}
       whileHover={reducedMotion ? undefined : { y: -4 }}
     >
-      <motion.div
-        className="project-showcase-stage"
-        style={reducedMotion ? undefined : { y: stageOffset }}
-      >
+      <div className="project-showcase-stage">
         <div className="project-showcase-frame">
           <div className="project-stage-toolbar" aria-hidden>
             <div className="project-stage-dots">
@@ -61,10 +41,7 @@ function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index:
             <span className="project-stage-chip">{project.platform}</span>
           </div>
 
-          <motion.div
-            className="project-stage-glow"
-            style={reducedMotion ? undefined : { scale: stageGlowScale }}
-          />
+          <div className="project-stage-glow" />
 
           <div className="project-stage-image-shell">
             <AnimatePresence mode="wait" initial={false}>
@@ -137,7 +114,7 @@ function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index:
             );
           })}
         </div>
-      </motion.div>
+      </div>
 
       <div className="project-showcase-body">
         <div className="project-heading-row">

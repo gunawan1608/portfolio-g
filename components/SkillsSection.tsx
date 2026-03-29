@@ -1,13 +1,8 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionIntro from "@/components/SectionIntro";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type Skill = {
   name: string;
@@ -89,6 +84,7 @@ function SkillIcon({ skill, delay }: { skill: Skill; delay: number }) {
           width={30}
           height={30}
           loading="lazy"
+          decoding="async"
           onError={(e) => {
             const img = e.currentTarget;
             img.style.display = "none";
@@ -136,38 +132,8 @@ function CategoryCard({ category, index }: { category: SkillCategory; index: num
 }
 
 export default function SkillsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>(".skill-category-card").forEach((card) => {
-        gsap.fromTo(
-          card,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 88%",
-              end: "top 60%",
-              scrub: false,
-              toggleActions: "play none none none",
-            },
-          },
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section id="skills" ref={sectionRef} className="section section-muted">
+    <section id="skills" className="section section-muted">
       <div className="container">
         <SectionIntro
           eyebrow="Skills"

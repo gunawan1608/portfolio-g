@@ -28,34 +28,14 @@ export default function Navbar() {
         { y: 0, opacity: 1, duration: 0.75, ease: "power3.out", delay: 0.1 },
       );
     }
+  }, []);
 
+  useEffect(() => {
     let frame = 0;
 
-    const readState = () => {
-      setScrolled(window.scrollY > 18);
-
-      const navHeight = navRef.current?.offsetHeight ?? 0;
-      const marker = navHeight + 28;
-      let current: SectionId | null = null;
-
-      for (const item of navigationItems) {
-        const section = document.getElementById(item.id);
-
-        if (!section) {
-          continue;
-        }
-
-        const rect = section.getBoundingClientRect();
-        const start = rect.top;
-        const end = rect.bottom;
-
-        if (marker >= start && marker < end) {
-          current = item.id;
-          break;
-        }
-      }
-
-      setActiveId(current);
+    const readScrolledState = () => {
+      const next = window.scrollY > 18;
+      setScrolled((current) => (current === next ? current : next));
     };
 
     const onScroll = () => {
@@ -65,13 +45,12 @@ export default function Navbar() {
 
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        readState();
+        readScrolledState();
       });
     };
 
-    readState();
+    readScrolledState();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", readState);
 
     return () => {
       if (frame) {
@@ -79,7 +58,81 @@ export default function Navbar() {
       }
 
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", readState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const navEl = navRef.current;
+    if (!navEl) {
+      return;
+    }
+
+    const observedEntries = new Map<SectionId, IntersectionObserverEntry>();
+    let observer: IntersectionObserver | null = null;
+    let resizeFrame = 0;
+
+    const updateActiveSection = () => {
+      const visibleSections = navigationItems
+        .map((item) => observedEntries.get(item.id))
+        .filter(
+          (entry): entry is IntersectionObserverEntry => Boolean(entry?.isIntersecting),
+        )
+        .sort((left, right) => {
+          if (right.intersectionRatio !== left.intersectionRatio) {
+            return right.intersectionRatio - left.intersectionRatio;
+          }
+
+          return Math.abs(left.boundingClientRect.top) - Math.abs(right.boundingClientRect.top);
+        });
+
+      const nextActive = (visibleSections[0]?.target.id as SectionId | undefined) ?? null;
+      setActiveId((current) => (current === nextActive ? current : nextActive));
+    };
+
+    const connectObserver = () => {
+      observer?.disconnect();
+      observedEntries.clear();
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            observedEntries.set(entry.target.id as SectionId, entry);
+          });
+
+          updateActiveSection();
+        },
+        {
+          rootMargin: `-${navEl.offsetHeight + 32}px 0px -55% 0px`,
+          threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+        },
+      );
+
+      navigationItems.forEach((item) => {
+        const section = document.getElementById(item.id);
+        if (section) {
+          observer?.observe(section);
+        }
+      });
+    };
+
+    const onResize = () => {
+      if (resizeFrame) {
+        window.cancelAnimationFrame(resizeFrame);
+      }
+
+      resizeFrame = window.requestAnimationFrame(connectObserver);
+    };
+
+    connectObserver();
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      if (resizeFrame) {
+        window.cancelAnimationFrame(resizeFrame);
+      }
+
+      observer?.disconnect();
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 

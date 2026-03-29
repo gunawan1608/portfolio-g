@@ -1,51 +1,54 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import type { CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
-    children: React.ReactNode;
-    delay?: number;
+  children: React.ReactNode;
+  delay?: number;
 };
 
 export default function ScrollAnimWrapper({ children, delay = 0 }: Props) {
-    const wrapRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-    useEffect(() => {
-        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduced) return;
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setIsVisible(true);
+      return;
+    }
 
-        const el = wrapRef.current;
-        if (!el) return;
+    const el = wrapRef.current;
+    if (!el) return;
 
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                el,
-                { y: 48, opacity: 0 },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.9,
-                    delay,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 88%",
-                        toggleActions: "play none none none",
-                    },
-                },
-            );
-        });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) {
+          return;
+        }
 
-        return () => ctx.revert();
-    }, [delay]);
-
-    return (
-        <div ref={wrapRef} style={{ opacity: 0 }}>
-            {children}
-        </div>
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -12% 0px",
+      },
     );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`scroll-anim-wrap${isVisible ? " is-visible" : ""}`}
+      style={{ "--scroll-anim-delay": `${delay}s` } as CSSProperties}
+    >
+      {children}
+    </div>
+  );
 }

@@ -1,75 +1,89 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
 
 export default function CursorFollower() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const supportsFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (coarse || reduced) return;
+    if (!supportsFinePointer || reduced) return;
 
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
-    document.body.style.cursor = "none";
-
-    let mouseX = -200;
-    let mouseY = -200;
-    let ringX = -200;
-    let ringY = -200;
+    let nativeCursorHidden = false;
     let visible = false;
-    let raf = 0;
 
-    // Position both off-screen initially via style (avoid GSAP initial state conflict)
+    const setPosition = (element: HTMLDivElement, x: number, y: number) => {
+      element.style.setProperty("--cursor-x", `${x}px`);
+      element.style.setProperty("--cursor-y", `${y}px`);
+    };
+
+    const setScale = (element: HTMLDivElement, scale: number) => {
+      element.style.setProperty("--cursor-scale", String(scale));
+    };
+
+    const hideNativeCursor = () => {
+      if (nativeCursorHidden) {
+        return;
+      }
+
+      document.body.style.cursor = "none";
+      nativeCursorHidden = true;
+    };
+
+    const restoreNativeCursor = () => {
+      if (!nativeCursorHidden) {
+        return;
+      }
+
+      document.body.style.cursor = "";
+      nativeCursorHidden = false;
+    };
+
+    setPosition(dot, -200, -200);
+    setPosition(ring, -200, -200);
+    setScale(dot, 1);
+    setScale(ring, 1);
     dot.style.opacity = "0";
     ring.style.opacity = "0";
-    dot.style.transform = "translate(-200px, -200px) translate(-50%, -50%)";
-    ring.style.transform = "translate(-200px, -200px) translate(-50%, -50%)";
-
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
-    const tick = () => {
-      ringX = lerp(ringX, mouseX, 0.12);
-      ringY = lerp(ringY, mouseY, 0.12);
-
-      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-
-      raf = requestAnimationFrame(tick);
-    };
 
     const show = () => {
       if (!visible) {
         visible = true;
-        gsap.to([dot, ring], { opacity: 1, duration: 0.18, overwrite: true });
+        hideNativeCursor();
+        dot.style.opacity = "1";
+        ring.style.opacity = "1";
       }
     };
 
     const hide = () => {
       if (visible) {
         visible = false;
-        gsap.to([dot, ring], { opacity: 0, duration: 0.18, overwrite: true });
+        dot.style.opacity = "0";
+        ring.style.opacity = "0";
       }
+
+      restoreNativeCursor();
     };
 
     const expand = () => {
-      gsap.to(dot, { scale: 1.6, duration: 0.2, overwrite: true });
-      gsap.to(ring, { scale: 1.3, duration: 0.25, overwrite: true });
+      setScale(dot, 1.6);
+      setScale(ring, 1.3);
     };
 
     const shrink = () => {
-      gsap.to(dot, { scale: 1, duration: 0.2, overwrite: true });
-      gsap.to(ring, { scale: 1, duration: 0.25, overwrite: true });
+      setScale(dot, 1);
+      setScale(ring, 1);
     };
 
     const onMove = (e: PointerEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      setPosition(dot, e.clientX, e.clientY);
+      setPosition(ring, e.clientX, e.clientY);
       show();
     };
 
@@ -83,26 +97,30 @@ export default function CursorFollower() {
       if (t?.closest("a, button, [data-hover]") && !rel?.closest("a, button, [data-hover]")) shrink();
     };
 
-    const onDown = () => gsap.to(ring, { scale: 0.85, duration: 0.1, overwrite: true });
+    const onDown = () => setScale(ring, 0.85);
     const onUp = () => shrink();
-
-    raf = requestAnimationFrame(tick);
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        hide();
+      }
+    };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
     window.addEventListener("blur", hide);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     document.documentElement.addEventListener("pointerleave", hide);
     document.addEventListener("pointerover", onOver);
     document.addEventListener("pointerout", onOut);
 
     return () => {
-      cancelAnimationFrame(raf);
-      document.body.style.cursor = "";
+      restoreNativeCursor();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("blur", hide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       document.documentElement.removeEventListener("pointerleave", hide);
       document.removeEventListener("pointerover", onOver);
       document.removeEventListener("pointerout", onOut);

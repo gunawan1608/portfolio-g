@@ -142,6 +142,20 @@ section {
   flex-direction: column;
 }
 
+.scroll-anim-wrap {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out);
+  transition-delay: var(--scroll-anim-delay, 0s);
+}
+
+.scroll-anim-wrap.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
 .container {
   width: min(var(--container), calc(100% - 40px));
   margin: 0 auto;
@@ -150,6 +164,19 @@ section {
 .section {
   position: relative;
   padding: clamp(88px, 8vw, 128px) 0;
+}
+
+@supports (content-visibility: auto) {
+  .section,
+  .site-footer {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 920px;
+  }
+
+  .hero-section {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
+  }
 }
 
 .section-muted {
@@ -295,8 +322,11 @@ section {
   left: 0;
   z-index: 9999;
   pointer-events: none;
-  will-change: transform, opacity;
+  --cursor-x: -200px;
+  --cursor-y: -200px;
+  --cursor-scale: 1;
   opacity: 0;
+  transform: translate3d(var(--cursor-x), var(--cursor-y), 0) translate(-50%, -50%) scale(var(--cursor-scale));
 }
 
 .cursor-dot {
@@ -305,6 +335,9 @@ section {
   border-radius: 50%;
   background: var(--green);
   box-shadow: 0 0 0 4px rgba(47, 138, 87, 0.18);
+  transition:
+    transform 0.04s linear,
+    opacity 0.18s ease;
 }
 
 .cursor-ring {
@@ -314,6 +347,9 @@ section {
   border: 1.5px solid rgba(47, 138, 87, 0.45);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(2px);
+  transition:
+    transform 0.18s var(--ease-out),
+    opacity 0.18s ease;
 }
 
 /* ─── Navbar ──────────────────────────────────────────────────── */
@@ -727,6 +763,7 @@ section {
   transition:
     box-shadow 0.28s var(--ease-out),
     border-color 0.28s var(--ease-out);
+  contain: layout paint;
 }
 
 .project-showcase-card::before {
@@ -1139,6 +1176,7 @@ section {
   display: grid;
   gap: 1.4rem;
   transition: box-shadow 0.3s var(--ease-out);
+  contain: layout paint;
 }
 
 .skill-category-card:hover {
@@ -1228,6 +1266,7 @@ section {
   background: var(--surface);
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
+  contain: layout paint;
 }
 
 .about-card-main {
@@ -1270,6 +1309,7 @@ section {
     linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(237, 246, 240, 0.92));
   box-shadow: var(--shadow-md);
   overflow: hidden;
+  contain: layout paint;
 }
 
 /* ─── Text column ───────────────────────────────────────────────── */
@@ -2232,6 +2272,7 @@ section {
   transition:
     box-shadow 0.28s var(--ease-out),
     border-color 0.28s var(--ease-out);
+  contain: layout paint;
 }
 
 .achievement-card:hover {
@@ -2502,6 +2543,7 @@ section {
   overflow: hidden;
   /* Ensure panel stacks above orbs */
   z-index: 2;
+  contain: layout paint;
 }
 
 /* Orbital ring decoration */
@@ -2698,7 +2740,7 @@ section {
   top: 0;
   height: 100%;
   border-radius: 999px;
-  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .exp-progress-shimmer {
@@ -2710,7 +2752,7 @@ section {
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-  transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Chapter dots */
@@ -2909,6 +2951,7 @@ section {
     box-shadow 0.28s var(--ease-out),
     border-color 0.28s var(--ease-out);
   display: block;
+  contain: layout paint;
 }
 
 .exp-card:hover,
@@ -2930,6 +2973,7 @@ section {
   pointer-events: none;
   border-radius: inherit;
   z-index: 0;
+  transition: opacity 0.28s var(--ease-out);
 }
 
 /* Left accent bar */
@@ -2942,6 +2986,7 @@ section {
   border-radius: 0 2px 2px 0;
   transform-origin: top;
   z-index: 2;
+  transition: transform 0.28s var(--ease-out);
 }
 
 /* Inner padding */
@@ -3225,6 +3270,7 @@ section {
   background: var(--surface);
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
+  contain: layout paint;
 }
 
 .contact-actions {
@@ -3256,6 +3302,7 @@ section {
   border: 1px solid rgba(255, 255, 255, 0.9);
   background: var(--surface);
   box-shadow: var(--shadow-md);
+  contain: layout paint;
 }
 
 .contact-link-label {
@@ -3707,6 +3754,7 @@ section {
   border: 1px solid rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-md);
+  contain: layout paint;
 }
 
 .site-footer-title {
@@ -4110,5 +4158,11 @@ section {
   .cursor-dot,
   .cursor-ring {
     display: none;
+  }
+
+  .scroll-anim-wrap {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

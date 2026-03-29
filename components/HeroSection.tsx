@@ -2,36 +2,24 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import portraitImage from "@/assets/images/portofolio_img.png";
 import { scrollToSection } from "@/lib/navigation";
 import { profile } from "@/lib/site-data";
-
-gsap.registerPlugin(ScrollTrigger); 
 
 const ROLE_LABEL = "Software Engineering Student";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const photoRef = useRef<HTMLDivElement>(null);
   const blobRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { amount: 0.2 });
   const heroFocus = profile.focus.slice(0, 3);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  const photoY = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, 40]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (reduced || !isInView) return;
 
     const ctx = gsap.context(() => {
       gsap.to(blobRef.current, {
@@ -53,7 +41,7 @@ export default function HeroSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isInView]);
 
   // Split name into chars for stagger animation, space included
   const nameChars = profile.name.split("");
@@ -66,7 +54,7 @@ export default function HeroSection() {
 
       <div className="container hero-shell">
         {/* Left: copy */}
-        <motion.div className="hero-copy" style={{ y: copyY, opacity }}>
+        <motion.div className="hero-copy">
           <motion.p
             className="eyebrow hero-eyebrow"
             initial={{ opacity: 0, y: 16 }}
@@ -178,9 +166,7 @@ export default function HeroSection() {
 
         {/* Right: photo — no text overlay at all */}
         <motion.div
-          ref={photoRef}
           className="hero-photo-wrap"
-          style={{ y: photoY }}
           initial={{ opacity: 0, x: 36, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={{ duration: 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
