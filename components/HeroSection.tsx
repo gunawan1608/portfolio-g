@@ -5,6 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { gsap } from "gsap";
 import { scrollToSection } from "@/lib/navigation";
 import { profile, skillGroups, achievements, experiences } from "@/lib/site-data";
+import GitHubSnakeCard from "@/components/GithubSnakeCard";
 
 const ROLE_LABEL = "Software Engineering Student";
 const E = [0.22, 1, 0.36, 1] as const;
@@ -404,6 +405,8 @@ export default function HeroSection() {
               <span className="hero-highlights-status-text">Portfolio is actively growing</span>
             </div>
           </motion.div>
+
+          <GitHubSnakeCard username="gunawan1608" />
         </motion.div>
       </div>
     </section>

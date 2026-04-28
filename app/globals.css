@@ -1275,6 +1275,402 @@ section {
   flex-shrink: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   HERO PANEL — NEW CARDS
+   Tambahkan ini ke app/globals.css (di bagian Hero Section)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Currently Building Card ──────────────────────────────────────── */
+.hero-building-card {
+  padding: 1.1rem 1.15rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(230,245,234,0.82));
+  box-shadow:
+    0 4px 16px rgba(47,138,87,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.hero-building-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.hero-building-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hero-building-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(47,138,87,0.1);
+  border: 1px solid rgba(47,138,87,0.18);
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: var(--green-ink);
+}
+
+.hero-building-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.hero-building-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hero-building-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.62rem 0.72rem;
+  border-radius: 14px;
+  border: 1px solid rgba(47,138,87,0.1);
+  background: rgba(255,255,255,0.6);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.hero-building-item:hover {
+  background: rgba(255,255,255,0.9);
+  border-color: rgba(47,138,87,0.2);
+}
+
+.hero-building-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(47,138,87,0.12), rgba(116,192,141,0.14));
+  border: 1px solid rgba(47,138,87,0.14);
+  color: var(--green-ink);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.hero-building-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-building-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.hero-building-desc {
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-top: 0.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-building-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.hero-building-tag--active {
+  background: rgba(47,138,87,0.12);
+  color: var(--green-ink);
+  border: 1px solid rgba(47,138,87,0.2);
+}
+
+.hero-building-tag--wip {
+  background: rgba(245,158,11,0.1);
+  color: #92400e;
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.hero-building-tag--soon {
+  background: rgba(99,102,241,0.1);
+  color: #3730a3;
+  border: 1px solid rgba(99,102,241,0.18);
+  border: 1px solid rgba(99,102,241,0.18);
+}
+
+/* ─── GitHub Snake Card ─────────────────────────────────────────────── */
+.gh-snake-card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(30, 80, 20, 0.35);
+  background: #0a1a0a;
+  box-shadow:
+    0 0 0 1px rgba(94, 234, 94, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(94, 234, 94, 0.06);
+  position: relative;
+}
+
+/* Nokia-style outer bezel */
+.gh-snake-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(94, 234, 94, 0.08);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Header row — pixel game bar */
+.gh-snake-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem 0.45rem;
+  background: #061006;
+  border-bottom: 1px solid rgba(94, 234, 94, 0.12);
+}
+
+.gh-snake-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gh-snake-pixel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5eea5e;
+  box-shadow: 0 0 6px #5eea5e;
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+.gh-snake-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: rgba(94, 234, 94, 0.7);
+  text-transform: uppercase;
+}
+
+.gh-snake-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.gh-snake-score-label {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  color: rgba(94, 234, 94, 0.4);
+  text-transform: uppercase;
+}
+
+.gh-snake-score {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: #c8ff00;
+  text-shadow: 0 0 8px rgba(200, 255, 0, 0.6);
+  font-weight: 500;
+}
+
+/* Canvas wrapper */
+.gh-snake-canvas-wrap {
+  position: relative;
+  width: 100%;
+  padding: 0.6rem;
+  background: #061006;
+  line-height: 0;
+}
+
+.gh-snake-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transition: opacity 0.5s ease;
+}
+
+/* CRT scanlines effect */
+.gh-snake-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 4px;
+}
+
+/* Screen glare */
+.gh-snake-glare {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  height: 35%;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.04) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Loading state */
+.gh-snake-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 4;
+  background: #061006;
+}
+
+.gh-snake-loading-text {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(94, 234, 94, 0.5);
+  animation: snake-blink 1s step-end infinite;
+}
+
+@keyframes snake-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Footer stats */
+.gh-snake-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.55rem 0.85rem;
+  background: #061006;
+  border-top: 1px solid rgba(94, 234, 94, 0.1);
+  gap: 0.5rem;
+}
+
+.gh-snake-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+}
+
+.gh-snake-stat-val {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5eea5e;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.gh-snake-stat-lbl {
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(94, 234, 94, 0.35);
+}
+
+.gh-snake-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #5eea5e;
+  box-shadow: 0 0 4px #5eea5e;
+  animation: pulse-dot 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.gh-snake-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(94, 234, 94, 0.1);
+  flex-shrink: 0;
+}
+
+/* Hint text */
+.gh-snake-hint {
+  text-align: center;
+  padding: 0.4rem 0.85rem 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: rgba(94, 234, 94, 0.25);
+  text-transform: uppercase;
+  background: #061006;
+  margin: 0;
+}
+
+/* ─── Responsive tweaks for new cards ──────────────────────────────── */
+@media (max-width: 860px) {
+  .gh-snake-card {
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-building-item {
+    padding: 0.5rem 0.6rem;
+    border-radius: 12px;
+  }
+
+  .hero-building-icon {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+  }
+
+  .gh-snake-hint {
+    font-size: 0.44rem;
+  }
+
+  .gh-snake-score {
+    font-size: 0.75rem;
+  }
+}
+
 /* ─── Projects Section ───────────────────────────────────────────────────── */
 .projects-section {
   overflow: hidden;
@@ -2111,6 +2507,19 @@ section {
   overflow: hidden;
 }
 
+.idcard-modal-shell,
+.idcard-modal-shell * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.idcard-modal-shell img,
+.idcard-modal-shell svg {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
 .idcard-modal-toolbar {
   display: flex;
   align-items: center;
@@ -2248,54 +2657,10 @@ section {
   border: 1px solid rgba(200,220,255,0.4);
 }
 
-/* Holographic shimmer sweep */
-.idcard-face::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-  border-radius: inherit;
-  background:
-    linear-gradient(
-      115deg,
-      transparent 0%,
-      rgba(255,80,120,0.06) 14%,
-      rgba(255,200,50,0.08) 22%,
-      rgba(80,255,160,0.07) 30%,
-      rgba(80,160,255,0.09) 38%,
-      rgba(200,80,255,0.06) 46%,
-      transparent 54%
-    );
-  background-size: 240% 100%;
-  animation: holoShimmer 6s ease-in-out infinite alternate;
-  mix-blend-mode: screen;
-  opacity: 0.72;
-}
-
-/* Specular glare streak */
-.idcard-face::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 11;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(
-    128deg,
-    rgba(255,255,255,0.52) 0%,
-    rgba(255,255,255,0.12) 18%,
-    transparent 34%,
-    transparent 78%,
-    rgba(255,255,255,0.08) 90%,
-    rgba(255,255,255,0.18) 100%
-  );
-}
-
-@keyframes holoShimmer {
-  0%   { background-position: 0% 50%; opacity: 0.55; }
-  50%  { background-position: 100% 50%; opacity: 0.82; }
-  100% { background-position: 200% 50%; opacity: 0.55; }
+.idcard-face::before,
+.idcard-face::after,
+.idcard-holo-glint {
+  display: none;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -2305,12 +2670,7 @@ section {
   display: grid;
   grid-template-rows: auto 1fr auto;
   background:
-    linear-gradient(158deg,
-      #daeeff 0%,
-      #c3e4fa 28%,
-      #b0d8f6 52%,
-      #bed9f0 72%,
-      #d0e8f7 100%);
+    linear-gradient(180deg, rgba(246, 249, 252, 0.98), rgba(232, 240, 247, 0.98));
   color: #0f3460;
 }
 
