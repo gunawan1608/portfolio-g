@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -1058,6 +1058,62 @@ section {
   font-size: 0.58rem;
   letter-spacing: 0.06em;
   color: var(--text-muted);
+}
+
+/* --- Hero GitHub Live Stats extras --- */
+.hero-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  margin-bottom: 0.1rem;
+  opacity: 0.75;
+}
+
+.hero-stat-skeleton {
+  display: block;
+  width: 3rem;
+  height: 1.8rem;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(47,138,87,0.08) 25%, rgba(47,138,87,0.18) 50%, rgba(47,138,87,0.08) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.hero-stat-skeleton--sm {
+  width: 2rem;
+  height: 1.35rem;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.hero-gh-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.28rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(47,138,87,0.18);
+  background: rgba(255,255,255,0.68);
+  backdrop-filter: blur(6px);
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  align-self: flex-start;
+}
+
+.hero-gh-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(47,138,87,0.2);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 /* â”€â”€â”€ Projects Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -3368,7 +3424,7 @@ section {
   line-height: 1;
 }
 
-/* â”€â”€â”€ Cards area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Cards area ───────────────────────────────────────────────────────────── */
 .exp-cards {
   display: grid;
   gap: 0;

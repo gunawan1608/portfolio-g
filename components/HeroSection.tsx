@@ -1,58 +1,74 @@
 "use client";
 
-import { type ReactElement, useEffect, useRef } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { gsap } from "gsap";
 import { scrollToSection } from "@/lib/navigation";
-import { profile, projects, skillGroups, achievements, experiences } from "@/lib/site-data";
+import { profile, skillGroups, achievements, experiences } from "@/lib/site-data";
 
 const ROLE_LABEL = "Software Engineering Student";
 const E = [0.22, 1, 0.36, 1] as const;
 
-const STATS = [
-  { value: String(projects.length), label: "Projects Built" },
-  {
-    value: String(skillGroups.reduce((n, g) => n + g.skills.length, 0)) + "+",
-    label: "Technologies",
-  },
-  { value: "2024", label: "Started Coding" },
-];
-
 const STACK = ["React", "Next.js", "Laravel", "TypeScript", "PHP", "GSAP", "Framer Motion", "Godot"];
 
-// Portfolio highlights replacing the "Find me on" social card
-const HIGHLIGHTS = [
-  {
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-      </svg>
-    ),
-    label: "Active Projects",
-    value: String(projects.length),
-    sub: "in portfolio",
-  },
-  {
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-      </svg>
-    ),
-    label: "Certifications",
-    value: String(achievements.length),
-    sub: "earned & verified",
-  },
-  {
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-    label: "Journey Stages",
-    value: String(experiences.length),
-    sub: "education path",
-  },
-];
+type GitHubStats = {
+  publicRepos: number;
+  followers: number;
+  totalStars: number;
+};
+
+// Animated count-up hook
+function useCountUp(target: number, duration = 1200, enabled = true) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!enabled || target === 0) return;
+    let start: number | null = null;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setValue(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration, enabled]);
+  return value;
+}
+
+// Individual stat card with count-up
+function StatCard({
+  value,
+  label,
+  delay,
+  suffix = "",
+  isLoading,
+}: {
+  value: number;
+  label: string;
+  delay: number;
+  suffix?: string;
+  isLoading: boolean;
+}) {
+  const counted = useCountUp(value, 900, !isLoading && value > 0);
+  return (
+    <motion.div
+      className="hero-stat-card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: E }}
+      whileHover={{ y: -4, scale: 1.03 }}
+    >
+      {isLoading ? (
+        <span className="hero-stat-skeleton" aria-hidden />
+      ) : (
+        <strong className="hero-stat-value">
+          {counted}
+          {suffix}
+        </strong>
+      )}
+      <span className="hero-stat-label">{label}</span>
+    </motion.div>
+  );
+}
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -61,6 +77,22 @@ export default function HeroSection() {
   const isInView = useInView(sectionRef, { amount: 0.2 });
   const heroFocus = profile.focus.slice(0, 3);
   const nameChars = profile.name.split("");
+
+  const [ghStats, setGhStats] = useState<GitHubStats | null>(null);
+  const [ghLoading, setGhLoading] = useState(true);
+
+  // Fetch GitHub stats
+  useEffect(() => {
+    fetch("/api/github-stats")
+      .then((r) => r.json())
+      .then((data: GitHubStats) => {
+        setGhStats(data);
+        setGhLoading(false);
+      })
+      .catch(() => {
+        setGhLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -71,6 +103,88 @@ export default function HeroSection() {
     }, sectionRef);
     return () => ctx.revert();
   }, [isInView]);
+
+  // Stats row: GitHub live data
+  const statsRow = [
+    {
+      value: ghStats?.publicRepos ?? 0,
+      label: "GitHub Repos",
+      suffix: "",
+      icon: (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+      ),
+    },
+    {
+      value: ghStats?.followers ?? 0,
+      label: "Followers",
+      suffix: "",
+      icon: (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      ),
+    },
+    {
+      value: ghStats?.totalStars ?? 0,
+      label: "Total Stars",
+      suffix: "",
+      icon: (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+    },
+  ];
+
+  // Portfolio highlights (bottom card)
+  const HIGHLIGHTS: {
+    icon: ReactElement;
+    label: string;
+    value: string;
+    sub: string;
+    isGh?: boolean;
+    ghValue?: number;
+  }[] = [
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+      ),
+      label: "GitHub Repos",
+      value: ghLoading ? "—" : String(ghStats?.publicRepos ?? 0),
+      sub: "public repositories",
+      isGh: true,
+      ghValue: ghStats?.publicRepos,
+    },
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+      ),
+      label: "Certifications",
+      value: String(achievements.length),
+      sub: "earned & verified",
+    },
+    {
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      ),
+      label: "Journey Stages",
+      value: String(experiences.length),
+      sub: "education path",
+    },
+  ];
+
+  const techCount = skillGroups.reduce((n, g) => n + g.skills.length, 0);
 
   return (
     <section id="top" ref={sectionRef} className="hero-section">
@@ -187,9 +301,9 @@ export default function HeroSection() {
           animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={{ duration: 0.85, delay: 0.28, ease: E }}
         >
-          {/* Stats row */}
+          {/* GitHub Stats row */}
           <div className="hero-stats-row">
-            {STATS.map(({ value, label }, i) => (
+            {statsRow.map(({ value, label, suffix, icon }, i) => (
               <motion.div
                 key={label}
                 className="hero-stat-card"
@@ -198,11 +312,30 @@ export default function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.1, ease: E }}
                 whileHover={{ y: -4, scale: 1.03 }}
               >
-                <strong className="hero-stat-value">{value}</strong>
+                <span className="hero-stat-icon" aria-hidden>{icon}</span>
+                {ghLoading ? (
+                  <span className="hero-stat-skeleton" aria-hidden />
+                ) : (
+                  <CountUp target={value} suffix={suffix} />
+                )}
                 <span className="hero-stat-label">{label}</span>
               </motion.div>
             ))}
           </div>
+
+          {/* GitHub live badge */}
+          <motion.div
+            className="hero-gh-live-badge"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7, ease: E }}
+          >
+            <span className="hero-gh-live-dot" aria-hidden />
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>Live from github.com/gunawan1608</span>
+          </motion.div>
 
           {/* Tech stack */}
           <motion.div
@@ -231,7 +364,7 @@ export default function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Portfolio Highlights — replaces "Find me on" */}
+          {/* Portfolio Highlights */}
           <motion.div
             className="hero-highlights-card"
             initial={{ opacity: 0, y: 20 }}
@@ -240,7 +373,7 @@ export default function HeroSection() {
           >
             <div className="hero-highlights-head">
               <p className="hero-highlights-label">Portfolio At a Glance</p>
-              <span className="hero-highlights-badge">Updated 2026</span>
+              <span className="hero-highlights-badge">{techCount}+ Skills</span>
             </div>
             <div className="hero-highlights-list">
               {HIGHLIGHTS.map((item, i) => (
@@ -256,7 +389,13 @@ export default function HeroSection() {
                     <span className="hero-highlight-label">{item.label}</span>
                     <span className="hero-highlight-sub">{item.sub}</span>
                   </span>
-                  <strong className="hero-highlight-value">{item.value}</strong>
+                  <strong className="hero-highlight-value">
+                    {item.isGh && ghLoading ? (
+                      <span className="hero-stat-skeleton hero-stat-skeleton--sm" aria-hidden />
+                    ) : (
+                      item.value
+                    )}
+                  </strong>
                 </motion.div>
               ))}
             </div>
@@ -269,4 +408,22 @@ export default function HeroSection() {
       </div>
     </section>
   );
+}
+
+// Inline count-up component
+function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    let start: number | null = null;
+    const dur = 900;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / dur, 1);
+      setVal(Math.floor(p * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target]);
+  return <strong className="hero-stat-value">{val}{suffix}</strong>;
 }
