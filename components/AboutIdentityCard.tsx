@@ -7,7 +7,8 @@ import { createPortal } from "react-dom";
 import type { Map as LeafletMap } from "leaflet";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
-import cardPortrait from "@/assets/images/image_for_card_about.png";
+// Use the hero portrait image for the ID card photo
+import cardPortrait from "@/assets/images/portofolio_img.png";
 import { profile } from "@/lib/site-data";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -26,6 +27,7 @@ export default function AboutIdentityCard() {
   const stageRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const holoRef = useRef<HTMLDivElement>(null);
   const mapHostRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const rotationRef = useRef(INITIAL_ROTATION);
@@ -70,6 +72,27 @@ export default function AboutIdentityCard() {
       );
     }, stageRef);
     return () => ctx.revert();
+  }, [isOpen, reducedMotion]);
+
+  // Mouse-move holographic shimmer — tracks pointer over the stage
+  useEffect(() => {
+    if (reducedMotion || !isOpen || !stageRef.current || !holoRef.current) return;
+    const stage = stageRef.current;
+
+    const onMove = (e: MouseEvent) => {
+      const rect = stage.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;   // 0..1
+      const py = (e.clientY - rect.top) / rect.height;   // 0..1
+      if (holoRef.current) {
+        // Shift the holo gradient position based on pointer
+        const dx = px * 100;
+        const dy = py * 100;
+        holoRef.current.style.background = `radial-gradient(ellipse at ${dx}% ${dy}%, rgba(255,255,255,0.18) 0%, transparent 60%)`;
+      }
+    };
+
+    stage.addEventListener("mousemove", onMove);
+    return () => stage.removeEventListener("mousemove", onMove);
   }, [isOpen, reducedMotion]);
 
   useEffect(() => {
@@ -132,21 +155,21 @@ export default function AboutIdentityCard() {
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     dragRef.current = { active: true, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, ox: rotationRef.current.x, oy: rotationRef.current.y };
-    gsap.to(tiltRef.current, { scale: 1.018, duration: 0.18, ease: "power2.out", overwrite: true });
+    gsap.to(tiltRef.current, { scale: 1.022, duration: 0.18, ease: "power2.out", overwrite: true });
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!dragRef.current.active) return;
-    const rx = clamp(dragRef.current.ox - (e.clientY - dragRef.current.startY) * 0.13, -26, 26);
-    const ry = clamp(dragRef.current.oy + (e.clientX - dragRef.current.startX) * 0.15, -36, 36);
+    const rx = clamp(dragRef.current.ox - (e.clientY - dragRef.current.startY) * 0.13, -28, 28);
+    const ry = clamp(dragRef.current.oy + (e.clientX - dragRef.current.startX) * 0.15, -38, 38);
     rotationRef.current = { x: rx, y: ry };
-    gsap.set(tiltRef.current, { rotateX: rx, rotateY: ry, scale: 1.018 });
+    gsap.set(tiltRef.current, { rotateX: rx, rotateY: ry, scale: 1.022 });
   };
   const onPointerEnd = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!dragRef.current.active) return;
     if (dragRef.current.pointerId !== null && e.currentTarget.hasPointerCapture(dragRef.current.pointerId))
       e.currentTarget.releasePointerCapture(dragRef.current.pointerId);
     dragRef.current.active = false;
-    gsap.to(tiltRef.current, { scale: 1, duration: 0.22, ease: "power2.out", overwrite: true });
+    gsap.to(tiltRef.current, { scale: 1, duration: 0.28, ease: "power2.out", overwrite: true });
   };
 
   return (
@@ -251,6 +274,9 @@ export default function AboutIdentityCard() {
                 <div ref={stageRef} className="idcard-modal-stage">
                   <div ref={glowRef} className="idcard-modal-glow" aria-hidden />
 
+                  {/* Mouse-tracking holographic glint */}
+                  <div ref={holoRef} className="idcard-holo-glint" aria-hidden />
+
                   <div
                     ref={tiltRef}
                     className="idcard-canvas"
@@ -314,7 +340,7 @@ export default function AboutIdentityCard() {
                                 alt={`Portrait of ${profile.name}`}
                                 fill
                                 className="idcf-photo-img"
-                                sizes="(max-width: 640px) 92px, 112px"
+                                sizes="(max-width: 640px) 100px, 112px"
                                 priority
                               />
                             </div>
@@ -371,7 +397,7 @@ export default function AboutIdentityCard() {
                       <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.1"/>
                       <path d="M4 6.5h5M6.5 4v5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
                     </svg>
-                    Hold & drag to rotate in 3D
+                    Hold &amp; drag to rotate in 3D
                   </p>
                 </div>
               </motion.div>

@@ -151,7 +151,7 @@ function ExperienceCard({
                       />
                       <circle cx="6.5" cy="8.5" r="1" fill="currentColor" />
                     </svg>
-                    Internship at Bank Syariah Indonesia (BSN)
+                    Internship at Badan Standardisasi Nasional (BSN)
                   </div>
                 ) : null}
               </div>
