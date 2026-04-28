@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { navigationItems, scrollToSection, type SectionId } from "@/lib/navigation";
 import { profile } from "@/lib/site-data";
@@ -10,149 +9,110 @@ import brandLogo from "@/assets/images/GMP.png";
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState<SectionId | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
+  // Entrance animation
   useEffect(() => {
-    if (!navRef.current) {
-      return;
-    }
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (!reducedMotion) {
+    if (!navRef.current) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
       gsap.fromTo(
         navRef.current,
-        { y: -20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.75, ease: "power3.out", delay: 0.1 },
+        { y: -56, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.05 },
       );
     }
   }, []);
 
+  // Scroll state + progress bar
   useEffect(() => {
     let frame = 0;
-
-    const readScrolledState = () => {
-      const next = window.scrollY > 18;
-      setScrolled((current) => (current === next ? current : next));
-    };
-
     const onScroll = () => {
-      if (frame) {
-        return;
-      }
-
+      if (frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        readScrolledState();
+        const scrollY = window.scrollY;
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        setScrolled(scrollY > 24);
+        setScrollProgress(docH > 0 ? Math.min((scrollY / docH) * 100, 100) : 0);
       });
     };
-
-    readScrolledState();
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-
     return () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-      }
-
+      if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
+  // Active section via IntersectionObserver
   useEffect(() => {
     const navEl = navRef.current;
-    if (!navEl) {
-      return;
-    }
+    if (!navEl) return;
 
-    const observedEntries = new Map<SectionId, IntersectionObserverEntry>();
+    const observed = new Map<SectionId, IntersectionObserverEntry>();
     let observer: IntersectionObserver | null = null;
     let resizeFrame = 0;
 
-    const updateActiveSection = () => {
-      const visibleSections = navigationItems
-        .map((item) => observedEntries.get(item.id))
-        .filter(
-          (entry): entry is IntersectionObserverEntry => Boolean(entry?.isIntersecting),
-        )
-        .sort((left, right) => {
-          if (right.intersectionRatio !== left.intersectionRatio) {
-            return right.intersectionRatio - left.intersectionRatio;
-          }
-
-          return Math.abs(left.boundingClientRect.top) - Math.abs(right.boundingClientRect.top);
-        });
-
-      const nextActive = (visibleSections[0]?.target.id as SectionId | undefined) ?? null;
-      setActiveId((current) => (current === nextActive ? current : nextActive));
+    const update = () => {
+      const visible = navigationItems
+        .map((item) => observed.get(item.id))
+        .filter((e): e is IntersectionObserverEntry => Boolean(e?.isIntersecting))
+        .sort((a, b) =>
+          b.intersectionRatio !== a.intersectionRatio
+            ? b.intersectionRatio - a.intersectionRatio
+            : Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top),
+        );
+      const next = (visible[0]?.target.id as SectionId | undefined) ?? null;
+      setActiveId((c) => (c === next ? c : next));
     };
 
-    const connectObserver = () => {
+    const connect = () => {
       observer?.disconnect();
-      observedEntries.clear();
-
+      observed.clear();
       observer = new IntersectionObserver(
         (entries) => {
-          entries.forEach((entry) => {
-            observedEntries.set(entry.target.id as SectionId, entry);
-          });
-
-          updateActiveSection();
+          entries.forEach((e) => observed.set(e.target.id as SectionId, e));
+          update();
         },
         {
-          rootMargin: `-${navEl.offsetHeight + 32}px 0px -55% 0px`,
+          rootMargin: `-${navEl.offsetHeight + 24}px 0px -55% 0px`,
           threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
         },
       );
-
       navigationItems.forEach((item) => {
-        const section = document.getElementById(item.id);
-        if (section) {
-          observer?.observe(section);
-        }
+        const el = document.getElementById(item.id);
+        if (el) observer?.observe(el);
       });
     };
 
     const onResize = () => {
-      if (resizeFrame) {
-        window.cancelAnimationFrame(resizeFrame);
-      }
-
-      resizeFrame = window.requestAnimationFrame(connectObserver);
+      if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(connect);
     };
 
-    connectObserver();
+    connect();
     window.addEventListener("resize", onResize);
-
     return () => {
-      if (resizeFrame) {
-        window.cancelAnimationFrame(resizeFrame);
-      }
-
+      if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       observer?.disconnect();
       window.removeEventListener("resize", onResize);
     };
   }, []);
 
+  // Close mobile menu on wide viewport
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 860px)");
-    const syncMenuState = (event?: MediaQueryListEvent) => {
-      const matches = event ? event.matches : mediaQuery.matches;
-
-      if (!matches) {
-        setMenuOpen(false);
-      }
+    const mq = window.matchMedia("(max-width: 860px)");
+    const sync = (e?: MediaQueryListEvent) => {
+      if (!(e ? e.matches : mq.matches)) setMenuOpen(false);
     };
-
-    syncMenuState();
-
-    mediaQuery.addEventListener("change", syncMenuState);
-
-    return () => {
-      mediaQuery.removeEventListener("change", syncMenuState);
-    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   const handleNavigate = (target: SectionId | "top") => {
@@ -165,7 +125,16 @@ export default function Navbar() {
       ref={navRef}
       className={`site-nav${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-open" : ""}`}
     >
+      {/* Scroll progress bar */}
+      <div
+        ref={progressRef}
+        className="nav-progress"
+        style={{ width: `${scrollProgress}%` }}
+        aria-hidden
+      />
+
       <div className="container nav-shell">
+        {/* Brand */}
         <button
           type="button"
           className="nav-brand"
@@ -173,13 +142,12 @@ export default function Navbar() {
           data-hover
           aria-label="Back to top"
         >
-          {/* Logo tanpa background apapun */}
           <span className="nav-brand-mark" aria-hidden>
             <Image
               src={brandLogo}
               alt=""
               className="nav-brand-logo"
-              sizes="44px"
+              sizes="38px"
               priority
             />
           </span>
@@ -189,36 +157,88 @@ export default function Navbar() {
           </span>
         </button>
 
-        <button
-          type="button"
-          className="nav-toggle"
-          onClick={() => setMenuOpen((current) => !current)}
-          aria-expanded={menuOpen}
-          aria-controls="primary-navigation"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-        >
-          <span className="nav-toggle-lines" aria-hidden>
-            <span />
-            <span />
-            <span />
-          </span>
-        </button>
-
+        {/* Desktop nav links */}
         <nav id="primary-navigation" className="nav-links" aria-label="Primary">
+          {navigationItems.map((item) => {
+            const isActive = activeId === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`nav-link${isActive ? " is-active" : ""}`}
+                onClick={() => handleNavigate(item.id)}
+                data-hover
+              >
+                {item.label}
+                {isActive && <span className="nav-link-pip" aria-hidden />}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Right: CTA + hamburger */}
+        <div className="nav-right">
+          <button
+            type="button"
+            className="nav-cta button button-primary button-compact"
+            onClick={() => handleNavigate("contact")}
+            data-hover
+          >
+            Let&apos;s Talk
+          </button>
+
+          <button
+            type="button"
+            className="nav-toggle"
+            onClick={() => setMenuOpen((c) => !c)}
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+          >
+            <span className="nav-toggle-lines" aria-hidden>
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      <div className="nav-drawer" aria-hidden={!menuOpen}>
+        <div className="nav-drawer-inner">
           {navigationItems.map((item) => (
-            <motion.button
+            <button
               key={item.id}
               type="button"
-              className={`nav-link${activeId === item.id ? " is-active" : ""}`}
+              className={`nav-drawer-link${activeId === item.id ? " is-active" : ""}`}
               onClick={() => handleNavigate(item.id)}
-              whileHover={{ y: -1 }}
-              transition={{ duration: 0.2 }}
+              tabIndex={menuOpen ? 0 : -1}
               data-hover
             >
-              {item.label}
-            </motion.button>
+              <span className="nav-drawer-link-label">{item.label}</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                <path
+                  d="M3 7h8M8 4l3 3-3 3"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           ))}
-        </nav>
+
+          <button
+            type="button"
+            className="nav-drawer-cta button button-primary"
+            onClick={() => handleNavigate("contact")}
+            tabIndex={menuOpen ? 0 : -1}
+            data-hover
+          >
+            Let&apos;s Talk
+          </button>
+        </div>
       </div>
     </header>
   );
