@@ -513,6 +513,8 @@ section {
   display: flex;
   align-items: center;
   gap: 0.65rem;
+  width: 100%;
+  justify-content: flex-end;
   flex-shrink: 0;
 }
  
