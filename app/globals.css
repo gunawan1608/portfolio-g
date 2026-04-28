@@ -2165,6 +2165,26 @@ section {
   overflow: hidden;
 }
 
+@media (max-width: 640px) {
+  .idcard-modal-overlay {
+    padding: 0.75rem;
+    place-items: start center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .idcard-modal-shell {
+    max-height: calc(100dvh - 1.5rem);
+    overflow: hidden;
+  }
+
+  .idcard-modal-stage {
+    min-height: auto;
+    padding: 1rem 0.75rem 1.15rem;
+    overflow: visible;
+  }
+}
+
 .idcard-modal-glow {
   position: absolute;
   inset: 8% 18%;
@@ -5304,6 +5324,10 @@ body {
     padding: 0.85rem;
     border-radius: 22px;
     gap: 0.85rem;
+  }
+
+  .projects-section {
+    overflow: visible;
   }
 
   .project-showcase-frame {
