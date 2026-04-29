@@ -22,7 +22,7 @@ export default function HeroSection() {
   const glowRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { amount: 0.2 });
   const heroFocus = profile.focus.slice(0, 3);
-  const nameChars = profile.name.split("");
+  const nameWords = profile.name.split(" ");
 
   const [ghStats, setGhStats] = useState<GitHubStats | null>(null);
   const [ghLoading, setGhLoading] = useState(true);
@@ -31,11 +31,20 @@ export default function HeroSection() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/github-stats", { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data: GitHubStats) => {
+    fetch("/api/github-stats", { signal: controller.signal, cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unable to load GitHub stats.");
+        }
+        return response.json();
+      })
+      .then((data: Partial<GitHubStats>) => {
         if (controller.signal.aborted) return;
-        setGhStats(data);
+        setGhStats({
+          publicRepos: Number.isFinite(data.publicRepos) ? Number(data.publicRepos) : 0,
+          followers: Number.isFinite(data.followers) ? Number(data.followers) : 0,
+          totalStars: Number.isFinite(data.totalStars) ? Number(data.totalStars) : 0,
+        });
         setGhLoading(false);
       })
       .catch(() => {
@@ -158,17 +167,30 @@ export default function HeroSection() {
           </motion.p>
 
           <h1 className="hero-title" aria-label={profile.name}>
-            {nameChars.map((char, i) => (
-              <motion.span
-                key={i}
-                className={char === " " ? "hero-title-space" : "hero-title-char"}
-                aria-hidden
-                initial={{ opacity: 0, y: 36 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.18 + i * 0.025, ease: E }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
+            {nameWords.map((word, wordIndex) => (
+              <span className="hero-title-word" key={word}>
+                {word.split("").map((char, charIndex) => {
+                  const delayIndex = nameWords
+                    .slice(0, wordIndex)
+                    .reduce((sum, current) => sum + current.length + 1, 0) + charIndex;
+
+                  return (
+                    <motion.span
+                      key={`${word}-${charIndex}`}
+                      className="hero-title-char"
+                      aria-hidden
+                      initial={{ opacity: 0, y: 36 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.55, delay: 0.18 + delayIndex * 0.025, ease: E }}
+                    >
+                      {char}
+                    </motion.span>
+                  );
+                })}
+                {wordIndex < nameWords.length - 1 ? (
+                  <span className="hero-title-word-space" aria-hidden />
+                ) : null}
+              </span>
             ))}
           </h1>
 

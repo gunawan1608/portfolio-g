@@ -758,11 +758,8 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
       const reducedMotion =
         typeof window !== "undefined" &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const mobileOrTouch =
-        typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 760px), (hover: none) and (pointer: coarse)").matches;
 
-      if (nextCalendar.activeDays > 0 && !reducedMotion && !mobileOrTouch) {
+      if (nextCalendar.activeDays > 0 && !reducedMotion) {
         runningRef.current = true;
         rafRef.current = requestAnimationFrame(animationLoop);
       }
