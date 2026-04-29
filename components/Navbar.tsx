@@ -9,11 +9,9 @@ import brandLogo from "@/assets/images/GMP.png";
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState<SectionId | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Entrance animation
   useEffect(() => {
@@ -28,7 +26,7 @@ export default function Navbar() {
     }
   }, []);
 
-  // Scroll state + progress bar
+  // Scroll state
   useEffect(() => {
     let frame = 0;
     const onScroll = () => {
@@ -36,9 +34,8 @@ export default function Navbar() {
       frame = window.requestAnimationFrame(() => {
         frame = 0;
         const scrollY = window.scrollY;
-        const docH = document.documentElement.scrollHeight - window.innerHeight;
-        setScrolled(scrollY > 24);
-        setScrollProgress(docH > 0 ? Math.min((scrollY / docH) * 100, 100) : 0);
+        const nextScrolled = scrollY > 24;
+        setScrolled((current) => (current === nextScrolled ? current : nextScrolled));
       });
     };
     onScroll();
@@ -125,14 +122,6 @@ export default function Navbar() {
       ref={navRef}
       className={`site-nav${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-open" : ""}`}
     >
-      {/* Scroll progress bar */}
-      <div
-        ref={progressRef}
-        className="nav-progress"
-        style={{ width: `${scrollProgress}%` }}
-        aria-hidden
-      />
-
       <div className="container nav-shell">
         {/* Brand */}
         <button

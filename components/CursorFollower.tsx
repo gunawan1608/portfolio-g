@@ -9,81 +9,77 @@ export default function CursorFollower() {
   useEffect(() => {
     const supportsFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!supportsFinePointer || reduced) return;
+    const compactViewport = window.matchMedia("(max-width: 900px)").matches;
+    if (!supportsFinePointer || reduced || compactViewport) return;
 
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
-    let nativeCursorHidden = false;
     let visible = false;
+    let raf = 0;
+    let targetX = -120;
+    let targetY = -120;
+    let ringX = targetX;
+    let ringY = targetY;
+    let targetScale = 1;
+    let ringScale = 1;
 
-    const setPosition = (element: HTMLDivElement, x: number, y: number) => {
-      element.style.setProperty("--cursor-x", `${x}px`);
-      element.style.setProperty("--cursor-y", `${y}px`);
+    const place = (element: HTMLDivElement, x: number, y: number, scale: number) => {
+      element.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(${scale})`;
     };
 
-    const setScale = (element: HTMLDivElement, scale: number) => {
-      element.style.setProperty("--cursor-scale", String(scale));
-    };
+    const animate = () => {
+      ringX += (targetX - ringX) * 0.18;
+      ringY += (targetY - ringY) * 0.18;
+      ringScale += (targetScale - ringScale) * 0.2;
 
-    const hideNativeCursor = () => {
-      if (nativeCursorHidden) {
-        return;
+      place(dot, targetX, targetY, targetScale);
+      place(ring, ringX, ringY, ringScale);
+
+      if (visible) {
+        raf = window.requestAnimationFrame(animate);
       }
-
-      document.body.style.cursor = "none";
-      nativeCursorHidden = true;
     };
 
-    const restoreNativeCursor = () => {
-      if (!nativeCursorHidden) {
-        return;
-      }
-
-      document.body.style.cursor = "";
-      nativeCursorHidden = false;
-    };
-
-    setPosition(dot, -200, -200);
-    setPosition(ring, -200, -200);
-    setScale(dot, 1);
-    setScale(ring, 1);
+    place(dot, targetX, targetY, 1);
+    place(ring, ringX, ringY, 1);
     dot.style.opacity = "0";
     ring.style.opacity = "0";
 
     const show = () => {
       if (!visible) {
         visible = true;
-        hideNativeCursor();
         dot.style.opacity = "1";
         ring.style.opacity = "1";
+        raf = window.requestAnimationFrame(animate);
       }
     };
 
     const hide = () => {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
       if (visible) {
         visible = false;
         dot.style.opacity = "0";
         ring.style.opacity = "0";
       }
-
-      restoreNativeCursor();
     };
 
     const expand = () => {
-      setScale(dot, 1.6);
-      setScale(ring, 1.3);
+      targetScale = 1.35;
     };
 
     const shrink = () => {
-      setScale(dot, 1);
-      setScale(ring, 1);
+      targetScale = 1;
     };
 
     const onMove = (e: PointerEvent) => {
-      setPosition(dot, e.clientX, e.clientY);
-      setPosition(ring, e.clientX, e.clientY);
+      targetX = e.clientX;
+      targetY = e.clientY;
       show();
     };
 
@@ -97,7 +93,9 @@ export default function CursorFollower() {
       if (t?.closest("a, button, [data-hover]") && !rel?.closest("a, button, [data-hover]")) shrink();
     };
 
-    const onDown = () => setScale(ring, 0.85);
+    const onDown = () => {
+      targetScale = 0.82;
+    };
     const onUp = () => shrink();
     const onVisibilityChange = () => {
       if (document.hidden) {
@@ -115,7 +113,7 @@ export default function CursorFollower() {
     document.addEventListener("pointerout", onOut);
 
     return () => {
-      restoreNativeCursor();
+      if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);

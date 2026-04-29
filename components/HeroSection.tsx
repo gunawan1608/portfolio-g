@@ -10,66 +10,11 @@ import GitHubSnakeCard from "@/components/GithubSnakeCard";
 const ROLE_LABEL = "Software Engineering Student";
 const E = [0.22, 1, 0.36, 1] as const;
 
-const STACK = ["React", "Next.js", "Laravel", "TypeScript", "PHP", "GSAP", "Framer Motion", "Godot"];
-
 type GitHubStats = {
   publicRepos: number;
   followers: number;
   totalStars: number;
 };
-
-// Animated count-up hook
-function useCountUp(target: number, duration = 1200, enabled = true) {
-  const [value, setValue] = useState(0);
-  useEffect(() => {
-    if (!enabled || target === 0) return;
-    let start: number | null = null;
-    const step = (ts: number) => {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      setValue(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, enabled]);
-  return value;
-}
-
-// Individual stat card with count-up
-function StatCard({
-  value,
-  label,
-  delay,
-  suffix = "",
-  isLoading,
-}: {
-  value: number;
-  label: string;
-  delay: number;
-  suffix?: string;
-  isLoading: boolean;
-}) {
-  const counted = useCountUp(value, 900, !isLoading && value > 0);
-  return (
-    <motion.div
-      className="hero-stat-card"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: E }}
-      whileHover={{ y: -4, scale: 1.03 }}
-    >
-      {isLoading ? (
-        <span className="hero-stat-skeleton" aria-hidden />
-      ) : (
-        <strong className="hero-stat-value">
-          {counted}
-          {suffix}
-        </strong>
-      )}
-      <span className="hero-stat-label">{label}</span>
-    </motion.div>
-  );
-}
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -84,20 +29,27 @@ export default function HeroSection() {
 
   // Fetch GitHub stats
   useEffect(() => {
-    fetch("/api/github-stats")
+    const controller = new AbortController();
+
+    fetch("/api/github-stats", { signal: controller.signal })
       .then((r) => r.json())
       .then((data: GitHubStats) => {
+        if (controller.signal.aborted) return;
         setGhStats(data);
         setGhLoading(false);
       })
       .catch(() => {
+        if (controller.signal.aborted) return;
         setGhLoading(false);
       });
+
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced || !isInView) return;
+    const mobileOrTouch = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
+    if (reduced || mobileOrTouch || !isInView) return;
     const ctx = gsap.context(() => {
       gsap.to(blobRef.current, { x: 32, y: -24, duration: 9, ease: "sine.inOut", repeat: -1, yoyo: true });
       gsap.to(glowRef.current, { scale: 1.15, opacity: 0.65, duration: 7, ease: "sine.inOut", repeat: -1, yoyo: true });
@@ -338,29 +290,78 @@ export default function HeroSection() {
             <span>Live from github.com/gunawan1608</span>
           </motion.div>
 
-          {/* Tech stack */}
+          {/* Portfolio working style */}
           <motion.div
-            className="hero-stack-card"
+            className="hero-building-card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.58, ease: E }}
           >
-            <div className="hero-stack-head">
-              <p className="hero-stack-label">Tech Stack</p>
-              <span className="hero-stack-dot" aria-hidden />
+            <div className="hero-building-head">
+              <p className="hero-building-label">Working Style</p>
+              <span className="hero-building-status">
+                <span className="hero-building-status-dot" aria-hidden />
+                Focused
+              </span>
             </div>
-            <div className="hero-stack-grid">
-              {STACK.map((tech, i) => (
-                <motion.span
-                  key={tech}
-                  className="hero-stack-chip"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.35, delay: 0.65 + i * 0.045, ease: E }}
-                  whileHover={{ y: -2, scale: 1.06 }}
+            <div className="hero-building-list">
+              {[
+                {
+                  icon: (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <rect x="3" y="4" width="18" height="14" rx="2" />
+                      <path d="M8 20h8" />
+                      <path d="M12 18v2" />
+                    </svg>
+                  ),
+                  name: "Responsive first",
+                  desc: "layouts checked before polish",
+                  tag: "Core",
+                  tagClass: "hero-building-tag--active",
+                },
+                {
+                  icon: (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M12 3v18" />
+                      <path d="M3 12h18" />
+                      <path d="m5 5 14 14" />
+                      <path d="m19 5-14 14" />
+                    </svg>
+                  ),
+                  name: "Motion with care",
+                  desc: "small transitions, clear feedback",
+                  tag: "Active",
+                  tagClass: "hero-building-tag--wip",
+                },
+                {
+                  icon: (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M4 7h16" />
+                      <path d="M4 12h16" />
+                      <path d="M4 17h10" />
+                    </svg>
+                  ),
+                  name: "Readable systems",
+                  desc: "components kept easy to extend",
+                  tag: "Habit",
+                  tagClass: "hero-building-tag--soon",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.name}
+                  className="hero-building-item"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.65 + i * 0.06, ease: E }}
+                  whileHover={{ y: -2 }}
                 >
-                  {tech}
-                </motion.span>
+                  <span className="hero-building-icon">{item.icon}</span>
+                  <span className="hero-building-info">
+                    <span className="hero-building-name">{item.name}</span>
+                    <span className="hero-building-desc">{item.desc}</span>
+                  </span>
+                  <span className={`hero-building-tag ${item.tagClass}`}>{item.tag}</span>
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -427,14 +428,16 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
   useEffect(() => {
     if (target === 0) { setVal(0); return; }
     let start: number | null = null;
+    let raf = 0;
     const dur = 900;
     const step = (ts: number) => {
       if (!start) start = ts;
       const p = Math.min((ts - start) / dur, 1);
       setVal(Math.floor(p * target));
-      if (p < 1) requestAnimationFrame(step);
+      if (p < 1) raf = requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [target]);
   return <strong className="hero-stat-value">{val}{suffix}</strong>;
 }

@@ -14,7 +14,8 @@ export default function ScrollAnimWrapper({ children, delay = 0 }: Props) {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
+    const mobileOrTouch = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)").matches;
+    if (reduced || mobileOrTouch) {
       setIsVisible(true);
       return;
     }
