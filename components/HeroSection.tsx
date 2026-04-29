@@ -405,10 +405,18 @@ export default function HeroSection() {
               <span className="hero-highlights-status-text">Portfolio is actively growing</span>
             </div>
           </motion.div>
-
-          <GitHubSnakeCard username="gunawan1608" />
         </motion.div>
       </div>
+
+      {/* Full-width GitHub Snake Card */}
+      <motion.div
+        className="hero-snake-fullwidth"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, delay: 1.1, ease: E }}
+      >
+        <GitHubSnakeCard username="gunawan1608" />
+      </motion.div>
     </section>
   );
 }

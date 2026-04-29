@@ -1435,6 +1435,12 @@ section {
   min-height: 360px;
 }
 
+/* ─── Hero Snake Full-Width ──────────────────────────────────────── */
+.hero-snake-fullwidth {
+  width: min(var(--container), calc(100% - 40px));
+  margin: 1.5rem auto 0;
+}
+
 /* Nokia-style outer bezel */
 .gh-snake-card::before {
   content: "";
@@ -1644,6 +1650,13 @@ section {
 
   .gh-snake-day-label {
     font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-snake-fullwidth {
+    width: calc(100% - 24px);
+    margin-top: 1rem;
   }
 }
 
