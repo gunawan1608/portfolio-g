@@ -232,7 +232,7 @@ export default function AboutIdentityCard() {
               </div>
             </div>
           </div>
-          <div className="idl-tag idl-tag-2">🪪 Digital ID</div>
+          <div className="idl-tag idl-tag-2">Digital ID</div>
         </div>
       </motion.div>
 
@@ -290,6 +290,10 @@ export default function AboutIdentityCard() {
                       animate={{ rotateY: isBackVisible ? 180 : 0 }}
                       transition={{ duration: reducedMotion ? 0.01 : 0.82, ease: EASE }}
                     >
+                      <span className="idcard-edge idcard-edge-top" aria-hidden />
+                      <span className="idcard-edge idcard-edge-right" aria-hidden />
+                      <span className="idcard-edge idcard-edge-bottom" aria-hidden />
+                      <span className="idcard-edge idcard-edge-left" aria-hidden />
 
                       {/* ══ FRONT ══ */}
                       <article className="idcard-face idcard-face-front">

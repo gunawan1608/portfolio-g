@@ -21,16 +21,23 @@ function StatsStrip({ journey }: { journey: ExperienceEntry[] }) {
   const totalYears = experiences.reduce((sum, entry) => sum + entry.years, 0);
   const currentChapter = journey.find((entry) => entry.status === "Current");
   const stats = [
-    { label: "Learning Years", value: `${totalYears}`, detail: "Education path" },
-    { label: "Chapters", value: `${journey.length}`, detail: "School to internship" },
-    { label: "Current Focus", value: currentChapter?.theme ?? "RPL", detail: "Active track" },
+    { label: "Learning Years", value: `${totalYears}`, detail: "Structured education path" },
+    { label: "Chapters", value: `${journey.length}`, detail: "School and internship" },
+    { label: "Current Focus", value: currentChapter?.theme ?? "RPL", detail: "Active development track" },
   ];
 
   return (
     <div className="expv4-stats" aria-label="Experience overview">
-      {stats.map((stat) => (
-        <div className="expv4-stat" key={stat.label}>
-          <span className="expv4-stat-label">{stat.label}</span>
+      {stats.map((stat, index) => (
+        <div
+          className="expv4-stat"
+          key={stat.label}
+          style={{ "--stat-accent": journey[index]?.accent ?? "var(--green)" } as CSSProperties}
+        >
+          <span className="expv4-stat-head">
+            <span className="expv4-stat-label">{stat.label}</span>
+            <span className="expv4-stat-mark" aria-hidden />
+          </span>
           <strong className="expv4-stat-value">{stat.value}</strong>
           <span className="expv4-stat-detail">{stat.detail}</span>
         </div>
@@ -65,15 +72,18 @@ function SpotlightPanel({
       style={{ "--exp-accent": item.accent } as CSSProperties}
       aria-label="Selected experience chapter"
     >
-      <div className="expv4-spotlight-head">
-        <div>
-          <span className="expv4-kicker">Selected Chapter</span>
-          <div className="expv4-chapter-count">
-            <strong>{formatIndex(index)}</strong>
-            <span>/ {String(total).padStart(2, "0")}</span>
-          </div>
+      <div className="expv4-spotlight-top">
+        <div className="expv4-chapter-count" aria-label={`Chapter ${index + 1} of ${total}`}>
+          <strong>{formatIndex(index)}</strong>
+          <span>/ {String(total).padStart(2, "0")}</span>
         </div>
-        <StatusBadge item={item} />
+        <div className="expv4-spotlight-head">
+          <div>
+            <span className="expv4-kicker">Selected Chapter</span>
+            <p className="expv4-spotlight-theme">{item.theme}</p>
+          </div>
+          <StatusBadge item={item} />
+        </div>
       </div>
 
       <div className="expv4-spotlight-titleblock">
@@ -97,7 +107,7 @@ function SpotlightPanel({
 
       <div className="expv4-progress" aria-label={`Journey progress ${progress}%`}>
         <div className="expv4-progress-row">
-          <span>Journey progress</span>
+          <span>Chapter position</span>
           <strong>{progress}%</strong>
         </div>
         <div className="expv4-progress-track">
@@ -149,6 +159,7 @@ function TimelineItem({
       aria-current={isActive ? "step" : undefined}
       data-hover
     >
+      <span className="expv4-item-accent" aria-hidden />
       <span className="expv4-item-marker" aria-hidden>
         <span>{formatIndex(index)}</span>
       </span>
@@ -177,6 +188,42 @@ function TimelineItem({
   );
 }
 
+function TimelinePanel({
+  activeIndex,
+  journey,
+  onSelect,
+}: {
+  activeIndex: number;
+  journey: ExperienceEntry[];
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="expv4-timeline-panel">
+      <div className="expv4-timeline-head">
+        <div>
+          <span className="expv4-kicker">Timeline Route</span>
+          <strong>{journey.length} connected chapters</strong>
+        </div>
+        <span className="expv4-timeline-state">
+          {formatIndex(activeIndex)} active
+        </span>
+      </div>
+
+      <div className="expv4-timeline" aria-label="Experience timeline">
+        {journey.map((item, index) => (
+          <TimelineItem
+            key={item.id}
+            item={item}
+            index={index}
+            isActive={index === activeIndex}
+            onActivate={() => onSelect(item.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ExperienceSection() {
   const [activeId, setActiveId] = useState(DEFAULT_ACTIVE_ID);
 
@@ -199,19 +246,13 @@ export default function ExperienceSection() {
         <div className="expv4-layout">
           <SpotlightPanel item={activeItem} index={activeIndex} total={JOURNEY.length} />
 
-          <div className="expv4-timeline" aria-label="Experience timeline">
-            {JOURNEY.map((item, index) => (
-              <TimelineItem
-                key={item.id}
-                item={item}
-                index={index}
-                isActive={item.id === activeId}
-                onActivate={() => {
-                  setActiveId((current) => (current === item.id ? current : item.id));
-                }}
-              />
-            ))}
-          </div>
+          <TimelinePanel
+            activeIndex={activeIndex}
+            journey={JOURNEY}
+            onSelect={(id) => {
+              setActiveId((current) => (current === id ? current : id));
+            }}
+          />
         </div>
       </div>
     </section>
