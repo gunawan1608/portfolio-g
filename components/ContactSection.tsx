@@ -43,8 +43,8 @@ const CONTACT_FEATURES = [
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.58A16 16 0 0 0 15.42 16.09l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
       </svg>
     ),
-    title: "Quick Response",
-    desc: "I typically reply within 24 hours",
+    title: "Quick reply",
+    desc: "I usually answer within a day",
   },
   {
     icon: (
@@ -52,8 +52,8 @@ const CONTACT_FEATURES = [
         <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
       </svg>
     ),
-    title: "Open to Collaborate",
-    desc: "Projects, internships & opportunities",
+    title: "Open to talk",
+    desc: "Projects, learning, and early opportunities",
   },
   {
     icon: (
@@ -61,8 +61,8 @@ const CONTACT_FEATURES = [
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
       </svg>
     ),
-    title: "Based in Jakarta",
-    desc: "Indonesia · Remote-friendly",
+    title: "Based in Indonesia",
+    desc: "Open to remote conversations",
   },
 ];
 
@@ -92,7 +92,7 @@ export default function ContactSection() {
           transition={{ duration: 0.65, ease: E }}
         >
           <p className="eyebrow contact-eyebrow">{contact.title}</p>
-          <h2 className="contact-title">Let&apos;s work together.</h2>
+          <h2 className="contact-title">Let&apos;s talk about the next build.</h2>
           <p className="contact-subtitle">{contact.description}</p>
         </motion.div>
 
@@ -112,7 +112,7 @@ export default function ContactSection() {
             <div className="contact-email-top">
               <span className="contact-email-chip">
                 <span className="contact-email-chip-dot" />
-                Available for opportunities
+                Open for opportunities
               </span>
             </div>
 
@@ -140,7 +140,7 @@ export default function ContactSection() {
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
-                Send Email
+                Send email
               </motion.a>
               <motion.button
                 type="button"
@@ -198,7 +198,7 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.2, ease: E }}
             >
-              Or find me on
+              You can also find me on
             </motion.p>
 
             <div className="contact-socials-list">
@@ -210,7 +210,7 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="contact-social-card"
                   style={{
-                    "--social-gradient": SOCIAL_GRADIENTS[social.label] ?? "linear-gradient(135deg, #2f8a57, #43a76c)",
+                    "--social-gradient": SOCIAL_GRADIENTS[social.label] ?? "linear-gradient(135deg, #da291c, #8f1018)",
                     "--social-color": SOCIAL_COLORS[social.label] ?? "#fff",
                   } as React.CSSProperties}
                   initial={{ opacity: 0, x: 24 }}
@@ -249,7 +249,7 @@ export default function ContactSection() {
                 <span className="contact-nudge-avatar-dot" />
               </div>
               <p className="contact-nudge-text">
-                <strong>Gunawan Madia</strong> is open to new projects and collaborations — don&apos;t hesitate to reach out!
+                <strong>Gunawan Madia</strong> is open to projects, collaborations, and helpful conversations.
               </p>
             </motion.div>
           </div>

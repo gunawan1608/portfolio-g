@@ -78,9 +78,9 @@ export default function AchievementsSection() {
       <section id="achievements" className="section section-muted">
         <div className="container">
           <SectionIntro
-            eyebrow="Achievement"
-            title="Training & Certifications."
-            description="Certifications earned through training programs, reflecting my continuous growth and dedication in learning technology."
+            eyebrow="Certificates"
+            title="Training that helped me practice."
+            description="Certificates from programs I joined while learning databases, cloud basics, Laravel, and data analytics."
           />
 
           <div className="achievement-grid">
@@ -120,7 +120,7 @@ export default function AchievementsSection() {
                     ) : null}
                   </div>
                   <span className="achievement-view-cta">
-                    View
+                    Open
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
                       <path
                         d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5"

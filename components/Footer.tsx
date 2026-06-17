@@ -14,7 +14,7 @@ export default function Footer() {
             {profile.name} / Portfolio / {year}
           </p>
           <p className="site-footer-copy">
-            Designed and built with Next.js, GSAP, and Framer Motion.
+            Built with Next.js, GSAP, and Framer Motion.
           </p>
         </div>
 

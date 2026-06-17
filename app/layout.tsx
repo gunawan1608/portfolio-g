@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Gunawan Madia Pratama | Portfolio",
   description:
-    "Frontend developer portfolio focused on clean interfaces, smooth motion, and responsive web experiences.",
+    "Fresh graduate student portfolio from Indonesia, with projects, certificates, and the learning path behind them.",
   openGraph: {
     title: "Gunawan Madia Pratama | Portfolio",
     description:
-      "Frontend developer from Indonesia building clean and polished web experiences.",
+      "Projects, certificates, and learning notes from Gunawan Madia Pratama.",
     type: "website",
   },
 };

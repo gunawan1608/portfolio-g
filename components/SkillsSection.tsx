@@ -20,7 +20,7 @@ type SkillCategory = {
 const SKILL_CATEGORIES: SkillCategory[] = [
   {
     title: "Web Development",
-    accent: "#2f8a57",
+    accent: "#da291c",
     skills: [
       { name: "PHP", icon: "php", color: "#777bb3" },
       { name: "JavaScript", icon: "javascript", color: "#f7df1e" },
@@ -137,8 +137,8 @@ export default function SkillsSection() {
       <div className="container">
         <SectionIntro
           eyebrow="Skills"
-          title="Technologies I work with."
-          description="From frontend to backend, mobile to desktop — tools I use to build meaningful products."
+          title="Tools I have been practicing with."
+          description="Frontend, backend, mobile, desktop, and the everyday tools I use when turning practice into working projects."
         />
 
         <div className="skill-categories-grid">

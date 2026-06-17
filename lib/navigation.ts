@@ -1,8 +1,8 @@
 export const navigationItems = [
-  { label: "Project", id: "projects" },
+  { label: "Projects", id: "projects" },
   { label: "Skills", id: "skills" },
-  { label: "About Me", id: "about" },
-  { label: "Achievement", id: "achievements" },
+  { label: "About", id: "about" },
+  { label: "Certificates", id: "achievements" },
   { label: "Experience", id: "experience" },
   { label: "Contact", id: "contact" },
 ] as const;

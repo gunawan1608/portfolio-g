@@ -4,7 +4,6 @@ import Image from "next/image";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { startTransition, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import type { Map as LeafletMap } from "leaflet";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { gsap } from "gsap";
 // Use the hero portrait image for the ID card photo
@@ -22,14 +21,11 @@ export default function AboutIdentityCard() {
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isBackVisible, setIsBackVisible] = useState(false);
-  const [isMapReady, setIsMapReady] = useState(false);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const holoRef = useRef<HTMLDivElement>(null);
-  const mapHostRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<LeafletMap | null>(null);
   const rotationRef = useRef(INITIAL_ROTATION);
   const dragRef = useRef({
     active: false,
@@ -41,7 +37,6 @@ export default function AboutIdentityCard() {
   });
 
   const id = profile.identityCard;
-  const coordsLabel = id.cityCoordinates.map((v) => v.toFixed(4)).join(", ");
   const fields = id.fields ?? [];
 
   useEffect(() => setIsMounted(true), []);
@@ -95,59 +90,6 @@ export default function AboutIdentityCard() {
     return () => stage.removeEventListener("mousemove", onMove);
   }, [isOpen, reducedMotion]);
 
-  useEffect(() => {
-    if (!isOpen || !mapHostRef.current || mapInstanceRef.current) return;
-    let disposed = false;
-    setIsMapReady(false);
-
-    const initMap = async () => {
-      const L = await import("leaflet");
-      if (disposed || !mapHostRef.current) return;
-
-      const map = L.map(mapHostRef.current, {
-        attributionControl: false, zoomControl: false,
-        boxZoom: false, doubleClickZoom: false,
-        dragging: false, keyboard: false,
-        scrollWheelZoom: false, touchZoom: false,
-      });
-      mapInstanceRef.current = map;
-
-      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}", {
-        minZoom: 3, maxZoom: 8,
-      }).addTo(map);
-
-      const bounds = L.latLngBounds(id.bounds.southWest, id.bounds.northEast);
-      map.fitBounds(bounds, { padding: [16, 16] });
-      map.setMaxBounds(bounds.pad(0.2));
-
-      L.circle(id.cityCoordinates, {
-        radius: 80000, color: "#e74c3c", weight: 1.5,
-        fillColor: "#e74c3c", fillOpacity: 0.12,
-      }).addTo(map);
-
-      L.circleMarker(id.cityCoordinates, {
-        radius: 7, color: "#ffffff", weight: 2.5,
-        fillColor: "#e74c3c", fillOpacity: 1,
-      }).addTo(map);
-
-      map.whenReady(() => { if (!disposed) { map.invalidateSize(); setIsMapReady(true); } });
-    };
-
-    initMap().catch(() => setIsMapReady(false));
-    return () => {
-      disposed = true;
-      mapInstanceRef.current?.remove();
-      mapInstanceRef.current = null;
-      setIsMapReady(false);
-    };
-  }, [id.bounds.northEast, id.bounds.southWest, id.cityCoordinates, isOpen]);
-
-  useEffect(() => {
-    if (!isOpen || !mapInstanceRef.current) return;
-    const t = window.setTimeout(() => mapInstanceRef.current?.invalidateSize(), reducedMotion ? 0 : 860);
-    return () => window.clearTimeout(t);
-  }, [isBackVisible, isOpen, reducedMotion]);
-
   const closeModal = () => startTransition(() => { setIsOpen(false); setIsBackVisible(false); });
   const openModal = () => startTransition(() => setIsOpen(true));
   const toggleFace = () => startTransition(() => setIsBackVisible((c) => !c));
@@ -182,11 +124,11 @@ export default function AboutIdentityCard() {
         transition={{ duration: 0.6, ease: EASE }}
       >
         <div className="idlauncher-text">
-          <span className="idlauncher-eyebrow">Personal</span>
+          <span className="idlauncher-eyebrow">Student</span>
           <h3 className="idlauncher-heading">Identity<br/>Card</h3>
           <p className="idlauncher-sub">
-            Front side shows my profile details.
-            Flip to explore the location map.
+            A small digital card with the basics.
+            Flip it for a plain Indonesia map.
           </p>
           <motion.button
             type="button"
@@ -209,7 +151,7 @@ export default function AboutIdentityCard() {
             <div className="idlauncher-card-preview">
               <div className="idlprev-header">
                 <div className="idlprev-flag"><span /><span /></div>
-                <span className="idlprev-title">IDENTITY CARD</span>
+                <span className="idlprev-title">STUDENT ID</span>
                 <div className="idlprev-emblem">
                   <svg viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="rgba(30,90,180,0.3)" strokeWidth="1.2"/>
@@ -232,7 +174,7 @@ export default function AboutIdentityCard() {
               </div>
             </div>
           </div>
-          <div className="idl-tag idl-tag-2">Digital ID</div>
+          <div className="idl-tag idl-tag-2">Personal ID</div>
         </div>
       </motion.div>
 
@@ -256,8 +198,7 @@ export default function AboutIdentityCard() {
               >
                 <div className="idcard-modal-toolbar">
                   <div className="idcard-modal-copy">
-                    <p className="eyebrow">Identity Card</p>
-                    <p className="idcard-modal-hint">Drag to rotate · Flip to see map</p>
+                    <p className="eyebrow">Student ID</p>
                   </div>
                   <div className="idcard-modal-actions">
                     <button type="button" className="button button-primary button-compact" onClick={toggleFace} data-hover>
@@ -308,7 +249,7 @@ export default function AboutIdentityCard() {
                         <div className="idcf-header">
                           <div className="idcf-flag"><span /><span /></div>
                           <div className="idcf-header-copy">
-                            <span className="idcf-card-type">Identity Card</span>
+                            <span className="idcf-card-type">{id.label}</span>
                           </div>
                           <div className="idcf-emblem" aria-hidden>
                             <svg viewBox="0 0 40 40" fill="none">
@@ -349,8 +290,8 @@ export default function AboutIdentityCard() {
                               />
                             </div>
                             <div className="idcf-photo-caption">
-                              <span>Jakarta, Indonesia</span>
-                              <span>28 March 2026</span>
+                              <span>Indonesia</span>
+                              <span>Issued 2026</span>
                             </div>
                           </div>
                         </div>
@@ -372,37 +313,38 @@ export default function AboutIdentityCard() {
                         <div className="idcb-header">
                           <div className="idcf-flag"><span /><span /></div>
                           <div className="idcb-header-copy">
-                            <span className="idcb-card-type">IDENTITY CARD</span>
+                            <span className="idcb-card-type">INDONESIA</span>
                           </div>
-                          <span className={`idcb-status ${isMapReady ? "is-ready" : ""}`}>
-                            {isMapReady ? "● Live" : "● Loading"}
-                          </span>
+                          <span className="idcb-status is-ready">Plain map</span>
                         </div>
 
                         <div className="idcb-map-frame">
-                          <div ref={mapHostRef} className="idcb-map-host" />
-                          {!isMapReady && (
-                            <div className="idcb-loading" aria-hidden>
-                              <div className="idcb-loading-ring" />
-                            </div>
-                          )}
+                          <div className="idcb-map-host">
+                            <span className="idcb-map-grid" aria-hidden />
+                            <svg className="idcb-indonesia-map" viewBox="0 0 640 320" fill="none" aria-hidden>
+                              <path className="island island-sumatra" d="M78 143C61 127 58 104 70 86C85 64 113 67 129 86C148 108 177 120 186 143C194 164 177 185 153 182C126 178 103 167 78 143Z" />
+                              <path className="island island-java" d="M176 221C218 211 270 210 315 220C326 223 329 235 318 241C270 252 216 249 173 237C162 233 164 224 176 221Z" />
+                              <path className="island island-kalimantan" d="M250 88C287 58 351 61 386 94C417 123 405 177 364 197C322 216 263 198 241 158C228 134 229 106 250 88Z" />
+                              <path className="island island-sulawesi" d="M420 125C443 98 475 99 486 123C493 139 479 153 463 161C485 166 506 184 500 203C494 223 465 214 449 193C436 214 410 228 395 214C380 200 397 177 418 168C398 155 403 139 420 125Z" />
+                              <path className="island island-papua" d="M520 137C555 112 602 117 623 147C643 175 623 215 586 219C550 223 516 199 503 171C496 156 504 145 520 137Z" />
+                              <path className="island island-bali" d="M334 239C348 235 363 237 373 244C361 253 343 253 334 239Z" />
+                              <path className="island island-ntt" d="M382 248C404 239 439 241 463 252C439 263 402 263 382 248Z" />
+                              <path className="island island-maluku" d="M493 234C509 225 529 229 539 243C522 252 504 249 493 234Z" />
+                              <path className="island island-maluku" d="M512 92C524 84 541 89 547 103C532 109 517 106 512 92Z" />
+                            </svg>
+                          </div>
                           <div className="idcb-vignette" aria-hidden /> 
                         </div>
 
                         <div className="idcb-footer">
+                          <span className="idcb-coords">Nusantara</span>
+                          <span className="idcb-owner">{id.issuedBy}</span>
                         </div>
                       </article>
 
                     </motion.div>
                   </div>
 
-                  <p className="idcard-drag-hint">
-                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                      <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.1"/>
-                      <path d="M4 6.5h5M6.5 4v5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                    </svg>
-                    Hold &amp; drag to rotate in 3D
-                  </p>
                 </div>
               </motion.div>
             </motion.div>

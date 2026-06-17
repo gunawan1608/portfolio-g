@@ -68,7 +68,7 @@ function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index:
 
         <div className="project-stage-caption">
           <div className="project-stage-caption-copy">
-            <span className="project-stage-caption-label">Selected Screen</span>
+            <span className="project-stage-caption-label">Current screen</span>
             <strong>{activeImage.label}</strong>
           </div>
           <span className="project-stage-count">
@@ -164,7 +164,7 @@ function ProjectShowcaseCard({ project, index }: { project: ProjectEntry; index:
           >
             {project.hrefLabel}
           </a>
-          <p className="project-link-note">Real screens included.</p>
+          <p className="project-link-note">Screens from the actual project.</p>
         </div>
       </div>
     </motion.article>
@@ -177,8 +177,8 @@ export default function ProjectsSection() {
       <div className="container">
         <SectionIntro
           eyebrow="Projects"
-          title="Things I've Built Along My Journey."
-          description="These projects represent my journey in building real applications, from simple ideas to functional systems."
+          title="Projects I have built while learning."
+          description="A few real builds from school, practice, and experiments. Some are simple, but each one taught me something useful."
         />
 
         <div className="project-showcase-list">

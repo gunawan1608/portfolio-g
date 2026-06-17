@@ -10,9 +10,9 @@ export default function AboutSection() {
     <section id="about" className="section">
       <div className="container">
         <SectionIntro
-          eyebrow="About Me"
-          title="A little about me and the way I build things."
-          description="I value clarity, thoughtful structure, and subtle details that bring everything together."
+          eyebrow="About"
+          title="A short note about how I learn and build."
+          description="I care about simple structure, readable code, and details that make a page feel easier to use."
         />
 
         <div className="about-grid">

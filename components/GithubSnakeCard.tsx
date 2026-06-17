@@ -62,7 +62,7 @@ const CELL = 10;
 const GAP = 3;
 const STEP = CELL + GAP;
 const GRAPH_HEIGHT = ROWS * STEP - GAP;
-const TICK_MS = 260;
+const TICK_MS = 190;
 const START_DELAY_MS = 520;
 const DPR_LIMIT = 2;
 
@@ -88,15 +88,15 @@ const WEEKDAY_LABELS = [
 ] as const;
 
 const CONTRIBUTION_COLORS: Record<ContributionLevel, string> = {
-  0: "#ebedf0",
-  1: "#9be9a8",
-  2: "#40c463",
-  3: "#30a14e",
-  4: "#216e39",
+  0: "#fff2ee",
+  1: "#ffd7d0",
+  2: "#ff9184",
+  3: "#da291c",
+  4: "#7a1217",
 };
 
-const SNAKE_BODY = "#2f8a57";
-const SNAKE_HEAD = "#1f6f43";
+const SNAKE_BODY_RGB = "218,41,28";
+const SNAKE_HEAD = "#111111";
 
 function mulberry32(seed: number) {
   return () => {
@@ -112,12 +112,22 @@ function clampLevel(level: number): ContributionLevel {
   return Math.max(0, Math.min(4, level)) as ContributionLevel;
 }
 
-function wrapX(x: number, cols: number) {
-  return ((x % cols) + cols) % cols;
+function cellKey(cell: Cell) {
+  return `${cell.x},${cell.y}`;
 }
 
-function wrapY(y: number) {
-  return ((y % ROWS) + ROWS) % ROWS;
+function inBounds(x: number, y: number, cols: number) {
+  return x >= 0 && x < cols && y >= 0 && y < ROWS;
+}
+
+function nextCell(cell: Cell, dir: Cell, cols: number): Cell | null {
+  const x = cell.x + dir.x;
+  const y = cell.y + dir.y;
+  return inBounds(x, y, cols) ? { x, y } : null;
+}
+
+function manhattan(a: Cell, b: Cell) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 function utcDate(year: number, month: number, day: number) {
@@ -170,18 +180,13 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+function easeMove(t: number) {
+  return t * t * (3 - 2 * t);
+}
+
 function interpolateWrapped(prev: Cell, current: Cell, cols: number, t: number) {
-  let fromX = prev.x;
-  let toX = current.x;
-  let fromY = prev.y;
-  let toY = current.y;
-
-  if (toX - fromX > cols / 2) fromX += cols;
-  if (fromX - toX > cols / 2) toX += cols;
-  if (toY - fromY > ROWS / 2) fromY += ROWS;
-  if (fromY - toY > ROWS / 2) toY += ROWS;
-
-  return { x: lerp(fromX, toX, t), y: lerp(fromY, toY, t) };
+  void cols;
+  return { x: lerp(prev.x, current.x, t), y: lerp(prev.y, current.y, t) };
 }
 
 function drawWrapped(
@@ -195,15 +200,11 @@ function drawWrapped(
   const width = graphWidth(cols) * dpr;
   const height = GRAPH_HEIGHT * dpr;
   const pad = CELL * dpr;
+  const px = x * STEP * dpr;
+  const py = y * STEP * dpr;
 
-  for (const ox of [-cols, 0, cols]) {
-    for (const oy of [-ROWS, 0, ROWS]) {
-      const px = (x + ox) * STEP * dpr;
-      const py = (y + oy) * STEP * dpr;
-      if (px > -pad && px < width && py > -pad && py < height) {
-        draw(px, py);
-      }
-    }
+  if (px > -pad && px < width && py > -pad && py < height) {
+    draw(px, py);
   }
 }
 
@@ -222,7 +223,7 @@ function drawHead(
   ctx.fill();
 
   const sheen = ctx.createLinearGradient(px, py, px + size, py + size);
-  sheen.addColorStop(0, "rgba(255,255,255,0.24)");
+  sheen.addColorStop(0, "rgba(251,225,34,0.34)");
   sheen.addColorStop(0.62, "rgba(255,255,255,0)");
   ctx.fillStyle = sheen;
   rrect(ctx, px, py, size, size, radius);
@@ -244,7 +245,7 @@ function drawHead(
     ctx.fill();
   }
 
-  ctx.fillStyle = "#0d1f13";
+  ctx.fillStyle = "#da291c";
   for (const eye of [eyeA, eyeB]) {
     ctx.beginPath();
     ctx.arc(
@@ -285,7 +286,7 @@ function drawGridLayer(
 }
 
 function bfsStep(head: Cell, target: Cell, snake: Cell[], cols: number): Cell | null {
-  const body = new Set(snake.map((segment) => `${segment.x},${segment.y}`));
+  const body = new Set(snake.slice(0, -1).map(cellKey));
   const dirs: Cell[] = [
     { x: 1, y: 0 },
     { x: -1, y: 0 },
@@ -296,12 +297,12 @@ function bfsStep(head: Cell, target: Cell, snake: Cell[], cols: number): Cell | 
   const seen = new Set<string>([`${head.x},${head.y}`]);
 
   for (const dir of dirs) {
-    const nx = wrapX(head.x + dir.x, cols);
-    const ny = wrapY(head.y + dir.y);
-    const key = `${nx},${ny}`;
+    const nextCellValue = nextCell(head, dir, cols);
+    if (!nextCellValue) continue;
+    const key = cellKey(nextCellValue);
     if (!body.has(key) && !seen.has(key)) {
       seen.add(key);
-      queue.push({ pos: { x: nx, y: ny }, first: dir });
+      queue.push({ pos: nextCellValue, first: dir });
     }
   }
 
@@ -311,12 +312,12 @@ function bfsStep(head: Cell, target: Cell, snake: Cell[], cols: number): Cell | 
     if (next.pos.x === target.x && next.pos.y === target.y) return next.first;
 
     for (const dir of dirs) {
-      const nx = wrapX(next.pos.x + dir.x, cols);
-      const ny = wrapY(next.pos.y + dir.y);
-      const key = `${nx},${ny}`;
+      const nextCellValue = nextCell(next.pos, dir, cols);
+      if (!nextCellValue) continue;
+      const key = cellKey(nextCellValue);
       if (!body.has(key) && !seen.has(key)) {
         seen.add(key);
-        queue.push({ pos: { x: nx, y: ny }, first: next.first });
+        queue.push({ pos: nextCellValue, first: next.first });
       }
     }
   }
@@ -325,7 +326,7 @@ function bfsStep(head: Cell, target: Cell, snake: Cell[], cols: number): Cell | 
 }
 
 function floodCount(start: Cell, snake: Cell[], cols: number) {
-  const body = new Set(snake.map((segment) => `${segment.x},${segment.y}`));
+  const body = new Set(snake.slice(1).map(cellKey));
   const dirs: Cell[] = [
     { x: 1, y: 0 },
     { x: -1, y: 0 },
@@ -346,7 +347,8 @@ function floodCount(start: Cell, snake: Cell[], cols: number) {
     count++;
 
     for (const dir of dirs) {
-      queue.push({ x: wrapX(cell.x + dir.x, cols), y: wrapY(cell.y + dir.y) });
+      const nextCellValue = nextCell(cell, dir, cols);
+      if (nextCellValue) queue.push(nextCellValue);
     }
   }
 
@@ -368,22 +370,28 @@ function chooseDir(
     { x: 0, y: -1 },
   ];
   const noReverse = dirs.filter((next) => !(next.x === -dir.x && next.y === -dir.y));
-  const body = new Set(snake.slice(0, -1).map((segment) => `${segment.x},${segment.y}`));
+  const body = new Set(snake.slice(0, -1).map(cellKey));
   const safe = noReverse.filter((next) => {
-    const nx = wrapX(head.x + next.x, cols);
-    const ny = wrapY(head.y + next.y);
-    return !body.has(`${nx},${ny}`);
+    const nextCellValue = nextCell(head, next, cols);
+    return Boolean(nextCellValue && !body.has(cellKey(nextCellValue)));
   });
 
-  if (!safe.length) return noReverse[0] ?? dir;
+  if (!safe.length) {
+    return (
+      dirs.find((next) => {
+        const nextCellValue = nextCell(head, next, cols);
+        return Boolean(nextCellValue && !body.has(cellKey(nextCellValue)));
+      }) ?? dir
+    );
+  }
 
   if (food) {
     const towardFood = bfsStep(head, food, snake, cols);
     if (towardFood && safe.some((next) => next.x === towardFood.x && next.y === towardFood.y)) {
-      const nx = wrapX(head.x + towardFood.x, cols);
-      const ny = wrapY(head.y + towardFood.y);
-      const afterMove = [{ x: nx, y: ny }, ...snake.slice(0, -1)];
-      if (floodCount({ x: nx, y: ny }, afterMove, cols) >= Math.min(snake.length, 5)) {
+      const nextHead = nextCell(head, towardFood, cols);
+      if (!nextHead) return towardFood;
+      const afterMove = [nextHead, ...snake.slice(0, -1)];
+      if (floodCount(nextHead, afterMove, cols) >= Math.min(snake.length, 5)) {
         return towardFood;
       }
     }
@@ -391,12 +399,16 @@ function chooseDir(
 
   return safe
     .map((next) => {
-      const nx = wrapX(head.x + next.x, cols);
-      const ny = wrapY(head.y + next.y);
-      const afterMove = [{ x: nx, y: ny }, ...snake.slice(0, -1)];
+      const nextHead = nextCell(head, next, cols)!;
+      const afterMove = [nextHead, ...snake.slice(0, -1)];
+      const foodDistance = food ? manhattan(nextHead, food) : 0;
       return {
         dir: next,
-        score: floodCount({ x: nx, y: ny }, afterMove, cols) + rng(),
+        score:
+          floodCount(nextHead, afterMove, cols) * 1.4 -
+          foodDistance * 0.9 +
+          (next.x === dir.x && next.y === dir.y ? 0.35 : 0) +
+          rng() * 0.2,
       };
     })
     .sort((a, b) => b.score - a.score)[0]!.dir;
@@ -473,12 +485,6 @@ function emptyCalendar(year: number, username: string): CalendarData {
   });
 }
 
-function sourceLabel(source: CalendarData["source"]) {
-  if (source === "github-graphql") return "GitHub GraphQL";
-  if (source === "github-profile") return "GitHub profile";
-  return "GitHub";
-}
-
 export default function GitHubSnakeCard({ username = "gunawan1608" }: { username?: string }) {
   const currentYear = useMemo(() => new Date().getFullYear(), []);
   const [selectedYear, setSelectedYear] = useState(currentYear);
@@ -509,7 +515,6 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     "--ghsc-graph-height": `${calendar.height}px`,
   } as CSSProperties;
 
-  const remainingDays = Math.max(0, calendar.activeDays - snakeStats.eaten);
   const contributionWord = calendar.totalContributions === 1 ? "contribution" : "contributions";
 
   const stopAnimation = useCallback(() => {
@@ -520,26 +525,44 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     }
   }, []);
 
-  const nearestFood = useCallback((grid: ContributionLevel[][], cols: number, head: Cell) => {
-    let best: Cell | null = null;
-    let bestDistance = Infinity;
+  const nearestFood = useCallback(
+    (grid: ContributionLevel[][], cols: number, head: Cell, snake = snakeRef.current) => {
+      if ((grid[head.x]?.[head.y] ?? 0) > 0) return head;
 
-    for (let x = 0; x < cols; x++) {
-      for (let y = 0; y < ROWS; y++) {
-        if ((grid[x]?.[y] ?? 0) > 0) {
-          const dx = Math.min(Math.abs(x - head.x), cols - Math.abs(x - head.x));
-          const dy = Math.min(Math.abs(y - head.y), ROWS - Math.abs(y - head.y));
-          const distance = dx + dy;
-          if (distance < bestDistance) {
-            bestDistance = distance;
-            best = { x, y };
+      const body = new Set(snake.slice(0, -1).map(cellKey));
+      const dirs: Cell[] = [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+        { x: 0, y: 1 },
+        { x: 0, y: -1 },
+      ];
+      const queue: Cell[] = [head];
+      const seen = new Set<string>([cellKey(head)]);
+
+      while (queue.length) {
+        const current = queue.shift();
+        if (!current) break;
+
+        if ((grid[current.x]?.[current.y] ?? 0) > 0) {
+          return current;
+        }
+
+        for (const dir of dirs) {
+          const nextCellValue = nextCell(current, dir, cols);
+          if (!nextCellValue) continue;
+          const key = cellKey(nextCellValue);
+
+          if (!seen.has(key) && !body.has(key)) {
+            seen.add(key);
+            queue.push(nextCellValue);
           }
         }
       }
-    }
 
-    return best;
-  }, []);
+      return null;
+    },
+    []
+  );
 
   const renderBaseLayer = useCallback(() => {
     const grid = gridRef.current;
@@ -584,7 +607,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     if (!ctx) return;
 
     const dpr = dprRef.current;
-    const t = Math.min(1, Math.max(0, progress));
+    const t = easeMove(Math.min(1, Math.max(0, progress)));
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (base) {
@@ -597,7 +620,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     if (food && (grid[food.x]?.[food.y] ?? 0) > 0) {
       const fx = food.x * STEP * dpr;
       const fy = food.y * STEP * dpr;
-      ctx.strokeStyle = "rgba(31,111,67,0.6)";
+      ctx.strokeStyle = "rgba(251,225,34,0.78)";
       ctx.lineWidth = 1.2 * dpr;
       rrect(ctx, fx - dpr, fy - dpr, CELL * dpr + 2 * dpr, CELL * dpr + 2 * dpr, 3 * dpr);
       ctx.stroke();
@@ -614,7 +637,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
       const alpha = 0.86 - (i / Math.max(1, length - 1)) * 0.44;
 
       drawWrapped(ctx, pos.x, pos.y, cols, dpr, (px, py) => {
-        ctx.fillStyle = `rgba(47,138,87,${alpha.toFixed(3)})`;
+        ctx.fillStyle = `rgba(${SNAKE_BODY_RGB},${alpha.toFixed(3)})`;
         rrect(ctx, px, py, CELL * dpr, CELL * dpr, 2.4 * dpr);
         ctx.fill();
 
@@ -650,7 +673,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     if (!grid || doneRef.current) return false;
 
     if (!foodRef.current || (grid[foodRef.current.x]?.[foodRef.current.y] ?? 0) === 0) {
-      foodRef.current = nearestFood(grid, cols, snakeRef.current[0]);
+      foodRef.current = nearestFood(grid, cols, snakeRef.current[0], snakeRef.current);
     }
 
     if (!foodRef.current) {
@@ -664,17 +687,18 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     dirRef.current = newDir;
 
     const head = snakeRef.current[0];
-    const nx = wrapX(head.x + newDir.x, cols);
-    const ny = wrapY(head.y + newDir.y);
-    const nextSnake = [{ x: nx, y: ny }, ...snakeRef.current];
-    const ate = (grid[nx]?.[ny] ?? 0) > 0;
+    const nextHead = nextCell(head, newDir, cols);
+    if (!nextHead) return true;
+
+    const nextSnake = [nextHead, ...snakeRef.current];
+    const ate = (grid[nextHead.x]?.[nextHead.y] ?? 0) > 0;
 
     prevRef.current = snakeRef.current.map((segment) => ({ ...segment }));
 
     if (ate) {
-      grid[nx][ny] = 0;
+      grid[nextHead.x][nextHead.y] = 0;
       eatenRef.current++;
-      foodRef.current = nearestFood(grid, cols, { x: nx, y: ny });
+      foodRef.current = nearestFood(grid, cols, nextHead, nextSnake);
       renderBaseLayer();
     } else {
       nextSnake.pop();
@@ -827,21 +851,19 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     setSelectedYear(Number(event.target.value));
   };
 
-  const sourceText = sourceLabel(calendar.source);
-
   return (
     <section className="ghsc-root" aria-label={`GitHub contribution calendar for ${username}`}>
       <div className="ghsc-topbar">
         <div className="ghsc-title-block">
-          <span className="ghsc-kicker">GitHub Activity</span>
+          <span className="ghsc-kicker">GitHub contributions</span>
           <h2 className="ghsc-title">
             {calendar.totalContributions.toLocaleString()} {contributionWord} in {calendar.year}
           </h2>
         </div>
 
         <label className="ghsc-year-picker">
-          <span>Contribution year</span>
-          <select value={selectedYear} onChange={handleYearChange} aria-label="Contribution year">
+          <span>Year</span>
+          <select value={selectedYear} onChange={handleYearChange} aria-label="Year">
             {calendar.years.map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -882,13 +904,13 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
               {status === "loading" && (
                 <div className="ghsc-overlay">
                   <span className="ghsc-spinner" aria-hidden />
-                  <span>Loading GitHub contributions...</span>
+                  <span>Loading contributions...</span>
                 </div>
               )}
 
               {status === "error" && (
                 <div className="ghsc-overlay ghsc-overlay-error" role="alert">
-                  <strong>Contribution data is unavailable.</strong>
+                  <strong>Could not load contribution data.</strong>
                   <span>{error}</span>
                 </div>
               )}
@@ -901,7 +923,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
 
               {status === "ready" && snakeStats.done && calendar.activeDays > 0 && (
                 <div className="ghsc-overlay ghsc-overlay-note">
-                  <span>All active days have been collected.</span>
+                  <span>The snake finished this year.</span>
                 </div>
               )}
 
@@ -921,7 +943,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
             target="_blank"
             rel="noreferrer"
           >
-            Learn how GitHub counts contributions
+            How GitHub counts this graph
           </a>
 
           <div className="ghsc-legend" aria-label="Contribution intensity legend">
@@ -939,36 +961,18 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         </div>
       </div>
 
-      <div className="ghsc-stats" aria-label="Snake animation stats">
-        <div className="ghsc-stat">
-          <strong>{remainingDays.toLocaleString()}</strong>
-          <span>days remaining</span>
-        </div>
-        <div className="ghsc-stat">
-          <strong>{snakeStats.eaten.toLocaleString()}</strong>
-          <span>days collected</span>
-        </div>
-        <div className="ghsc-stat">
-          <strong>{calendar.activeDays.toLocaleString()}</strong>
-          <span>active days</span>
-        </div>
-        <div className="ghsc-stat">
-          <strong>{snakeStats.length.toLocaleString()}</strong>
-          <span>snake length</span>
-        </div>
-        <div className="ghsc-source">Source: {sourceText}</div>
-      </div>
-
       <style>{`
         .ghsc-root {
           display: flex;
           flex-direction: column;
           gap: 0.82rem;
-          border: 1px solid rgba(208, 215, 222, 0.92);
+          border: 1px solid rgba(218, 41, 28, 0.18);
           border-radius: 8px;
-          background: rgba(255, 255, 255, 0.94);
-          box-shadow: 0 16px 36px rgba(27, 31, 36, 0.08);
-          color: #24292f;
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 243, 239, 0.94)),
+            linear-gradient(115deg, rgba(218, 41, 28, 0.08), transparent 48%, rgba(251, 225, 34, 0.14));
+          box-shadow: 0 18px 38px rgba(91, 14, 19, 0.1);
+          color: #171111;
           overflow: hidden;
           padding: 0.95rem;
         }
@@ -988,7 +992,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         }
 
         .ghsc-kicker {
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.64);
           font-family: var(--mono, monospace);
           font-size: 0.62rem;
           letter-spacing: 0.12em;
@@ -998,7 +1002,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
 
         .ghsc-title {
           margin: 0;
-          color: #24292f;
+          color: #171111;
           font-size: 1rem;
           font-weight: 600;
           letter-spacing: 0;
@@ -1009,7 +1013,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
           display: flex;
           align-items: center;
           gap: 0.48rem;
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.68);
           font-family: var(--mono, monospace);
           font-size: 0.68rem;
           line-height: 1;
@@ -1018,10 +1022,10 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
 
         .ghsc-year-picker select {
           min-width: 86px;
-          border: 1px solid #d0d7de;
+          border: 1px solid rgba(218, 41, 28, 0.18);
           border-radius: 6px;
-          background: #f6f8fa;
-          color: #24292f;
+          background: rgba(255, 255, 255, 0.84);
+          color: #171111;
           cursor: pointer;
           font: inherit;
           line-height: 1.2;
@@ -1029,9 +1033,9 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         }
 
         .ghsc-chart {
-          border: 1px solid #d0d7de;
+          border: 1px solid rgba(218, 41, 28, 0.15);
           border-radius: 6px;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.76);
           padding: 0.9rem 0.95rem 0.78rem;
         }
 
@@ -1060,7 +1064,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         .ghsc-month {
           position: absolute;
           top: 0;
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.62);
           font-size: 0.67rem;
           line-height: 1;
           transform: translateX(0);
@@ -1077,7 +1081,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         .ghsc-weekday {
           position: absolute;
           right: 8px;
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.62);
           font-size: 0.67rem;
           line-height: 10px;
         }
@@ -1106,8 +1110,8 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
           justify-content: center;
           gap: 0.45rem;
           border-radius: 6px;
-          background: rgba(246, 248, 250, 0.9);
-          color: #57606a;
+          background: rgba(255, 248, 246, 0.92);
+          color: rgba(91, 38, 42, 0.72);
           font-family: var(--mono, monospace);
           font-size: 0.66rem;
           text-align: center;
@@ -1116,11 +1120,11 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         .ghsc-overlay-error {
           flex-direction: column;
           padding: 0.85rem;
-          color: #cf222e;
+          color: #da291c;
         }
 
         .ghsc-overlay-error span {
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.7);
           font-family: inherit;
           font-size: 0.62rem;
           line-height: 1.45;
@@ -1129,14 +1133,14 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
 
         .ghsc-overlay-note {
           background: rgba(255, 255, 255, 0.86);
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.68);
         }
 
         .ghsc-spinner {
           width: 16px;
           height: 16px;
-          border: 2px solid rgba(87, 96, 106, 0.2);
-          border-top-color: #2f8a57;
+          border: 2px solid rgba(218, 41, 28, 0.16);
+          border-top-color: #da291c;
           border-radius: 50%;
           animation: ghscSpin 0.8s linear infinite;
           flex: 0 0 auto;
@@ -1156,13 +1160,13 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         }
 
         .ghsc-chart-footer a {
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.68);
           font-size: 0.68rem;
           text-decoration: none;
         }
 
         .ghsc-chart-footer a:hover {
-          color: #0969da;
+          color: #da291c;
           text-decoration: underline;
         }
 
@@ -1170,7 +1174,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
           display: inline-flex;
           align-items: center;
           gap: 0.28rem;
-          color: #57606a;
+          color: rgba(91, 38, 42, 0.68);
           font-size: 0.66rem;
           white-space: nowrap;
         }
@@ -1180,44 +1184,6 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
           height: 10px;
           border-radius: 2px;
           box-shadow: inset 0 0 0 1px rgba(27, 31, 36, 0.06);
-        }
-
-        .ghsc-stats {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
-          align-items: center;
-          gap: 0.66rem;
-          border-top: 1px solid rgba(208, 215, 222, 0.8);
-          padding-top: 0.78rem;
-        }
-
-        .ghsc-stat {
-          display: flex;
-          min-width: 0;
-          flex-direction: column;
-          gap: 0.14rem;
-        }
-
-        .ghsc-stat strong {
-          color: #24292f;
-          font-family: var(--mono, monospace);
-          font-size: 0.86rem;
-          line-height: 1;
-        }
-
-        .ghsc-stat span,
-        .ghsc-source {
-          color: #57606a;
-          font-family: var(--mono, monospace);
-          font-size: 0.57rem;
-          letter-spacing: 0.08em;
-          line-height: 1.35;
-          text-transform: uppercase;
-        }
-
-        .ghsc-source {
-          justify-self: end;
-          white-space: nowrap;
         }
 
         @media (max-width: 720px) {
@@ -1245,14 +1211,6 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
             min-width: calc(var(--ghsc-graph-width) + 34px);
           }
 
-          .ghsc-stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .ghsc-source {
-            justify-self: start;
-            grid-column: 1 / -1;
-          }
         }
 
         @media (prefers-reduced-motion: reduce) {

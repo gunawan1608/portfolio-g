@@ -11,7 +11,10 @@ import {
 
 const JOURNEY = [...experiences, featuredExperience];
 const DEFAULT_ACTIVE_ID =
-  JOURNEY.find((entry) => entry.status === "Current")?.id ?? JOURNEY[0]?.id ?? "";
+  JOURNEY.find((entry) => entry.status === "Fresh Graduate Student")?.id ??
+  featuredExperience.id ??
+  JOURNEY[0]?.id ??
+  "";
 
 function formatIndex(index: number) {
   return String(index + 1).padStart(2, "0");
@@ -19,11 +22,10 @@ function formatIndex(index: number) {
 
 function StatsStrip({ journey }: { journey: ExperienceEntry[] }) {
   const totalYears = experiences.reduce((sum, entry) => sum + entry.years, 0);
-  const currentChapter = journey.find((entry) => entry.status === "Current");
   const stats = [
-    { label: "Learning Years", value: `${totalYears}`, detail: "Structured education path" },
-    { label: "Chapters", value: `${journey.length}`, detail: "School and internship" },
-    { label: "Current Focus", value: currentChapter?.theme ?? "RPL", detail: "Active development track" },
+    { label: "School Years", value: `${totalYears}`, detail: "From elementary to vocational school" },
+    { label: "Current Status", value: "Fresh Graduate Student", detail: "SMK Negeri 1 Jakarta" },
+    { label: "Outside Class", value: "Internship", detail: "A first look at real work" },
   ];
 
   return (
@@ -47,9 +49,11 @@ function StatsStrip({ journey }: { journey: ExperienceEntry[] }) {
 }
 
 function StatusBadge({ item }: { item: ExperienceEntry }) {
+  const isHighlighted = item.status === "Fresh Graduate Student" || item.status === "Professional Experience";
+
   return (
     <span className="expv4-status">
-      <span className={`expv4-status-dot${item.status === "Current" ? " is-live" : ""}`} />
+      <span className={`expv4-status-dot${isHighlighted ? " is-live" : ""}`} />
       {item.status}
     </span>
   );
@@ -70,16 +74,16 @@ function SpotlightPanel({
     <aside
       className="expv4-spotlight"
       style={{ "--exp-accent": item.accent } as CSSProperties}
-      aria-label="Selected experience chapter"
+      aria-label="Selected experience step"
     >
       <div className="expv4-spotlight-top">
-        <div className="expv4-chapter-count" aria-label={`Chapter ${index + 1} of ${total}`}>
+        <div className="expv4-chapter-count" aria-label={`Step ${index + 1} of ${total}`}>
           <strong>{formatIndex(index)}</strong>
           <span>/ {String(total).padStart(2, "0")}</span>
         </div>
         <div className="expv4-spotlight-head">
           <div>
-            <span className="expv4-kicker">Selected Chapter</span>
+            <span className="expv4-kicker">Selected step</span>
             <p className="expv4-spotlight-theme">{item.theme}</p>
           </div>
           <StatusBadge item={item} />
@@ -107,7 +111,7 @@ function SpotlightPanel({
 
       <div className="expv4-progress" aria-label={`Journey progress ${progress}%`}>
         <div className="expv4-progress-row">
-          <span>Chapter position</span>
+          <span>Timeline position</span>
           <strong>{progress}%</strong>
         </div>
         <div className="expv4-progress-track">
@@ -115,7 +119,7 @@ function SpotlightPanel({
         </div>
       </div>
 
-      <div className="expv4-skill-list" aria-label="Chapter highlights">
+      <div className="expv4-skill-list" aria-label="Step highlights">
         {item.highlights.map((highlight) => (
           <span className="expv4-skill" key={highlight}>
             {highlight}
@@ -131,7 +135,7 @@ function SpotlightPanel({
               fill="currentColor"
             />
           </svg>
-          Real professional environment through BSN internship
+          First direct look at a professional environment through BSN
         </div>
       ) : null}
     </aside>
@@ -201,11 +205,11 @@ function TimelinePanel({
     <div className="expv4-timeline-panel">
       <div className="expv4-timeline-head">
         <div>
-          <span className="expv4-kicker">Timeline Route</span>
-          <strong>{journey.length} connected chapters</strong>
+          <span className="expv4-kicker">Timeline</span>
+          <strong>{journey.length} steps in the journey</strong>
         </div>
         <span className="expv4-timeline-state">
-          {formatIndex(activeIndex)} active
+          Step {formatIndex(activeIndex)}
         </span>
       </div>
 
@@ -237,8 +241,8 @@ export default function ExperienceSection() {
       <div className="container">
         <SectionIntro
           eyebrow="Experience"
-          title="From classroom to the real world."
-          description="Every chapter shaped how I think about building things - school years, clubs, and a real internship."
+          title="The school path that brought me here."
+          description="My education, projects, and internship experience are the base I am building from now."
         />
 
         <StatsStrip journey={JOURNEY} />

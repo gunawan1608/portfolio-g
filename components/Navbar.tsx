@@ -173,7 +173,7 @@ export default function Navbar() {
             onClick={() => handleNavigate("contact")}
             data-hover
           >
-            Let&apos;s Talk
+            Let&apos;s talk
           </button>
 
           <button
@@ -225,7 +225,7 @@ export default function Navbar() {
             tabIndex={menuOpen ? 0 : -1}
             data-hover
           >
-            Let&apos;s Talk
+            Let&apos;s talk
           </button>
         </div>
       </div>
