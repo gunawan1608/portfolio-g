@@ -95,6 +95,14 @@ export type AchievementEntry = {
   documentFileName: string;
 };
 
+/* ── Manchester United palette, used consistently for every accent below ──
+   Primary red   #DA020E   |  Deep red/maroon  #6E0410
+   Black         #0B0B0C   |  Gold             #F6C500            */
+const MU_RED = "#DA020E";
+const MU_RED_DEEP = "#6E0410";
+const MU_BLACK = "#0B0B0C";
+const MU_GOLD = "#F6C500";
+
 export const profile = {
   name: "Gunawan Madia Pratama",
   initials: "GM",
@@ -164,7 +172,7 @@ export const projects: ProjectEntry[] = [
       "A short horror game I made in Godot, built around small scenes, slow tension, and a simple loop that gets to the point.",
     stack: ["Godot", "Game Design", "Level Flow"],
     status: "Finished",
-    accent: "#da291c",
+    accent: MU_RED,
     href: "https://skibidi-team.itch.io/nightmare-house",
     hrefLabel: "Play on itch.io",
     images: [
@@ -194,7 +202,7 @@ export const projects: ProjectEntry[] = [
       "A web conversion project where I worked on the landing page, login flow, and the basic document conversion experience.",
     stack: ["Laravel", "React", "PHP", "JavaScript"],
     status: "Finished",
-    accent: "#b5121b",
+    accent: MU_BLACK,
     href: "https://github.com/gunawan1608/flexi_convert",
     hrefLabel: "View repository",
     images: [
@@ -224,7 +232,7 @@ export const projects: ProjectEntry[] = [
       "A desktop app for hospital data practice, with screens for patients, records, and day-to-day management tasks.",
     stack: ["C#", ".NET", "Desktop UI"],
     status: "Finished",
-    accent: "#111111",
+    accent: MU_GOLD,
     href: "https://github.com/gunawan1608/hospital-management-system",
     hrefLabel: "View repository",
     images: [
@@ -254,7 +262,7 @@ export const projects: ProjectEntry[] = [
       "A PHP library system with landing, registration, and management pages for books and members.",
     stack: ["PHP", "MySQL", "Web UI"],
     status: "Finished",
-    accent: "#fbe122",
+    accent: MU_RED_DEEP,
     href: "https://github.com/gunawan1608/Sistem-Perpustakaan",
     hrefLabel: "View repository",
     images: [
@@ -282,19 +290,19 @@ export const skillGroups: SkillGroup[] = [
     title: "Frontend",
     summary: "Interfaces that stay clean on different screen sizes.",
     skills: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-    accent: "#da291c",
+    accent: MU_RED,
   },
   {
     title: "Motion",
     summary: "Small transitions that make a page feel clearer, not noisier.",
     skills: ["GSAP", "ScrollTrigger", "Framer Motion", "CSS Animation"],
-    accent: "#ff6b5f",
+    accent: MU_GOLD,
   },
   {
     title: "Workflow",
     summary: "A tidy way of working so projects are easier to continue.",
     skills: ["Git", "Component Structure", "Responsive UI", "Performance"],
-    accent: "#8f1018",
+    accent: MU_BLACK,
   },
 ];
 
@@ -313,7 +321,7 @@ export const experiences: ExperienceEntry[] = [
     status: "Completed",
     theme: "First School Years",
     highlights: ["Early journey", "Basics", "Jakarta"],
-    accent: "#da291c",
+    accent: MU_RED,
   },
   {
     id: "public-junior-high-school-58-jakarta",
@@ -329,7 +337,7 @@ export const experiences: ExperienceEntry[] = [
     status: "Completed",
     theme: "Finding Rhythm",
     highlights: ["Growth phase", "Consistency", "Next step"],
-    accent: "#b5121b",
+    accent: MU_RED_DEEP,
   },
   {
     id: "state-vocational-high-school-1-jakarta",
@@ -345,7 +353,7 @@ export const experiences: ExperienceEntry[] = [
     status: "Fresh Graduate Student",
     theme: "Software Engineering Student",
     highlights: ["RPL graduate", "Projects", "Portfolio"],
-    accent: "#da291c",
+    accent: MU_RED,
   },
 ];
 
@@ -363,7 +371,7 @@ export const featuredExperience: ExperienceEntry = {
   status: "Professional Experience",
   theme: "Internship Chapter",
   highlights: ["BSN", "Internship", "2026"],
-  accent: "#c99700",
+  accent: MU_GOLD,
   special: true,
 };
 
@@ -375,7 +383,7 @@ export const achievements: AchievementEntry[] = [
     receivedAt: "September 2025",
     type: "Training",
     note: "Training that helped me practice databases and Laravel development in a more structured way.",
-    accent: "#da291c",
+    accent: MU_RED,
     skills: ["Database", "Laravel"],
     documentSlug: "pelatihan-kompetensi-rpl",
     documentFileName: "Gunawan Madia Pratama.pdf",
@@ -387,7 +395,7 @@ export const achievements: AchievementEntry[] = [
     receivedAt: "Jan 2024",
     type: "Training",
     note: "A short AWS learning path about cloud roles and the basics behind them.",
-    accent: "#ff6b5f",
+    accent: MU_GOLD,
     skills: ["Cloud"],
     documentSlug: "job-roles-in-the-cloud",
     documentFileName: "156_3_4826221_1705927366_AWS Course Completion Certificate.pdf",
@@ -397,9 +405,12 @@ export const achievements: AchievementEntry[] = [
     title: "Data Analytics untuk Siswa SMA/Sederajat",
     issuer: "Digital Talent Scholarship",
     receivedAt: "July 2024",
-    type: "Training ",
+    /* fixed: trailing space removed ("Training " -> "Training") which used
+       to make this pill render with slightly different measured width /
+       inconsistent trimming than the other two achievement cards */
+    type: "Training",
     note: "A Digital Talent Scholarship certificate for data analytics learning.",
-    accent: "#8f1018",
+    accent: MU_RED_DEEP,
     skills: ["Data Analyst"],
     credentialId: "1948180850-12/TA/BLSDM.Kominfo/2024",
     documentSlug: "data-analytics-siswa-sma",

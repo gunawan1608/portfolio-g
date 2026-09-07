@@ -91,11 +91,11 @@ const CONTRIBUTION_COLORS: Record<ContributionLevel, string> = {
   0: "#fff2ee",
   1: "#ffd7d0",
   2: "#ff9184",
-  3: "#da291c",
-  4: "#7a1217",
+  3: "#da020e",
+  4: "#6e0410",
 };
 
-const SNAKE_BODY_RGB = "218,41,28";
+const SNAKE_BODY_RGB = "218, 2, 14";
 const SNAKE_HEAD = "#111111";
 
 function mulberry32(seed: number) {
@@ -223,7 +223,7 @@ function drawHead(
   ctx.fill();
 
   const sheen = ctx.createLinearGradient(px, py, px + size, py + size);
-  sheen.addColorStop(0, "rgba(251,225,34,0.34)");
+  sheen.addColorStop(0, "rgba(246, 197, 0,0.34)");
   sheen.addColorStop(0.62, "rgba(255,255,255,0)");
   ctx.fillStyle = sheen;
   rrect(ctx, px, py, size, size, radius);
@@ -245,7 +245,7 @@ function drawHead(
     ctx.fill();
   }
 
-  ctx.fillStyle = "#da291c";
+  ctx.fillStyle = "#da020e";
   for (const eye of [eyeA, eyeB]) {
     ctx.beginPath();
     ctx.arc(
@@ -620,7 +620,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
     if (food && (grid[food.x]?.[food.y] ?? 0) > 0) {
       const fx = food.x * STEP * dpr;
       const fy = food.y * STEP * dpr;
-      ctx.strokeStyle = "rgba(251,225,34,0.78)";
+      ctx.strokeStyle = "rgba(246, 197, 0,0.78)";
       ctx.lineWidth = 1.2 * dpr;
       rrect(ctx, fx - dpr, fy - dpr, CELL * dpr + 2 * dpr, CELL * dpr + 2 * dpr, 3 * dpr);
       ctx.stroke();
@@ -966,11 +966,11 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
           display: flex;
           flex-direction: column;
           gap: 0.82rem;
-          border: 1px solid rgba(218, 41, 28, 0.18);
+          border: 1px solid rgba(218, 2, 14, 0.18);
           border-radius: 8px;
           background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 243, 239, 0.94)),
-            linear-gradient(115deg, rgba(218, 41, 28, 0.08), transparent 48%, rgba(251, 225, 34, 0.14));
+            linear-gradient(115deg, rgba(218, 2, 14, 0.08), transparent 48%, rgba(246, 197, 0, 0.14));
           box-shadow: 0 18px 38px rgba(91, 14, 19, 0.1);
           color: #171111;
           overflow: hidden;
@@ -1022,7 +1022,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
 
         .ghsc-year-picker select {
           min-width: 86px;
-          border: 1px solid rgba(218, 41, 28, 0.18);
+          border: 1px solid rgba(218, 2, 14, 0.18);
           border-radius: 6px;
           background: rgba(255, 255, 255, 0.84);
           color: #171111;
@@ -1033,7 +1033,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         }
 
         .ghsc-chart {
-          border: 1px solid rgba(218, 41, 28, 0.15);
+          border: 1px solid rgba(218, 2, 14, 0.15);
           border-radius: 6px;
           background: rgba(255, 255, 255, 0.76);
           padding: 0.9rem 0.95rem 0.78rem;
@@ -1120,7 +1120,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         .ghsc-overlay-error {
           flex-direction: column;
           padding: 0.85rem;
-          color: #da291c;
+          color: #da020e;
         }
 
         .ghsc-overlay-error span {
@@ -1139,8 +1139,8 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         .ghsc-spinner {
           width: 16px;
           height: 16px;
-          border: 2px solid rgba(218, 41, 28, 0.16);
-          border-top-color: #da291c;
+          border: 2px solid rgba(218, 2, 14, 0.16);
+          border-top-color: #da020e;
           border-radius: 50%;
           animation: ghscSpin 0.8s linear infinite;
           flex: 0 0 auto;
@@ -1166,7 +1166,7 @@ export default function GitHubSnakeCard({ username = "gunawan1608" }: { username
         }
 
         .ghsc-chart-footer a:hover {
-          color: #da291c;
+          color: #da020e;
           text-decoration: underline;
         }
 

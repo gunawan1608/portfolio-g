@@ -9,26 +9,29 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        // Previously referenced "Geist" / "Geist Mono", which are never
+        // loaded anywhere (layout.tsx only loads Instrument Serif, Plus
+        // Jakarta Sans, and IBM Plex Mono) — fixed to match reality.
         display: ['"Instrument Serif"', "Georgia", "serif"],
-        sans: ['"Geist"', '"Helvetica Neue"', "sans-serif"],
-        mono: ['"Geist Mono"', '"Courier New"', "monospace"]
+        sans: ['"Plus Jakarta Sans"', '"Helvetica Neue"', "sans-serif"],
+        mono: ['"IBM Plex Mono"', '"Courier New"', "monospace"]
       },
       colors: {
-        bg: "#f8f6f2",
-        "bg-alt": "#f0ece4",
+        bg: "#faf9f7",
+        "bg-alt": "#f4efe9",
         card: "#ffffff",
-        surface: "#eceae4",
-        ink: "#111110",
-        "ink-2": "#3a3834",
-        "ink-3": "#787470",
-        "ink-4": "#aeaaa6",
-        red: "#d4400f",
-        "red-bg": "#fdf0eb",
-        teal: "#1a7f5a",
-        "teal-bg": "#e8f7f2"
+        surface: "#f3ece9",
+        ink: "#16130f",
+        "ink-2": "#3d3632",
+        "ink-3": "#6b615c",
+        "ink-4": "#9b918c",
+        red: "#da020e",
+        "red-bg": "#fdecea",
+        gold: "#f6c500",
+        "gold-bg": "#fff9e0"
       },
       borderColor: {
-        DEFAULT: "rgba(0,0,0,0.08)"
+        DEFAULT: "rgba(11,11,12,0.09)"
       }
     }
   },

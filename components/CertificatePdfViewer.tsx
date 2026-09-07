@@ -7,7 +7,12 @@ type CertificatePdfViewerProps = {
   url: string;
 };
 
-function PdfSkeleton() {
+// If the iframe hasn't fired onLoad within this window, something went
+// wrong silently (blocked embed, slow network, unsupported viewer) — show
+// a way out instead of leaving the skeleton spinning forever.
+const LOAD_TIMEOUT_MS = 7000;
+
+function PdfSkeleton({ timedOut, url }: { timedOut: boolean; url: string }) {
   return (
     <div className="certv3-skeleton">
       <div className="certv3-skeleton-doc" aria-hidden>
@@ -29,7 +34,17 @@ function PdfSkeleton() {
           </div>
         </div>
       </div>
-      <p className="certv3-skeleton-label">Loading certificate…</p>
+
+      {timedOut ? (
+        <div className="certv3-pdf-fallback" role="status">
+          <p>Taking longer than expected to load the preview.</p>
+          <a href={url} target="_blank" rel="noreferrer">
+            Open the PDF directly instead
+          </a>
+        </div>
+      ) : (
+        <p className="certv3-skeleton-label">Loading certificate…</p>
+      )}
     </div>
   );
 }
@@ -37,6 +52,7 @@ function PdfSkeleton() {
 export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps) {
   const [loading, setLoading] = useState(true);
   const [shouldMountFrame, setShouldMountFrame] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
 
   // #toolbar=0&navpanes=0 hides the browser PDF toolbar for a clean embed
   const iframeSrc = `${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
@@ -44,12 +60,20 @@ export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps)
   useEffect(() => {
     setLoading(true);
     setShouldMountFrame(false);
+    setTimedOut(false);
 
-    const timer = window.setTimeout(() => {
+    const mountTimer = window.setTimeout(() => {
       setShouldMountFrame(true);
     }, 180);
 
-    return () => window.clearTimeout(timer);
+    const timeoutTimer = window.setTimeout(() => {
+      setTimedOut(true);
+    }, LOAD_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(mountTimer);
+      window.clearTimeout(timeoutTimer);
+    };
   }, [url]);
 
   return (
@@ -63,7 +87,7 @@ export default function CertificatePdfViewer({ url }: CertificatePdfViewerProps)
             exit={{ opacity: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
           >
-            <PdfSkeleton />
+            <PdfSkeleton timedOut={timedOut} url={url} />
           </motion.div>
         ) : null}
       </AnimatePresence>

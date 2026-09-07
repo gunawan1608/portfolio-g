@@ -24,10 +24,13 @@ const SOCIAL_ICONS: Record<string, ReactElement> = {
   ),
 };
 
+// Manchester United palette — black/red gradients for GitHub & LinkedIn,
+// a warmer red-gold gradient for Instagram so the three cards read as one
+// consistent family instead of borrowing each platform's own brand hues.
 const SOCIAL_GRADIENTS: Record<string, string> = {
-  GitHub: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-  LinkedIn: "linear-gradient(135deg, #0a66c2 0%, #0077b5 100%)",
-  Instagram: "linear-gradient(135deg, #833ab4 0%, #e1306c 55%, #fd1d1d 100%)",
+  GitHub: "linear-gradient(135deg, #0b0b0c 0%, #1c1a1b 100%)",
+  LinkedIn: "linear-gradient(135deg, #6e0410 0%, #da020e 100%)",
+  Instagram: "linear-gradient(135deg, #da020e 0%, #a4020c 55%, #6e0410 100%)",
 };
 
 const SOCIAL_COLORS: Record<string, string> = {
@@ -68,13 +71,28 @@ const CONTACT_FEATURES = [
 
 export default function ContactSection() {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
 
   const copyEmail = async () => {
-    await navigator.clipboard.writeText(profile.email);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
+    // navigator.clipboard can throw (insecure context, denied permission,
+    // older browsers) — this used to be an unhandled rejection that left
+    // the button looking broken with no feedback at all.
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(profile.email);
+      } else {
+        throw new Error("Clipboard API unavailable");
+      }
+      setCopyFailed(false);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setCopyFailed(true);
+      window.setTimeout(() => setCopyFailed(false), 2500);
+    }
   };
 
   return (
@@ -158,6 +176,15 @@ export default function ContactSection() {
                     </svg>
                     Copied!
                   </>
+                ) : copyFailed ? (
+                  <>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Select &amp; copy manually
+                  </>
                 ) : (
                   <>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -210,7 +237,7 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="contact-social-card"
                   style={{
-                    "--social-gradient": SOCIAL_GRADIENTS[social.label] ?? "linear-gradient(135deg, #da291c, #8f1018)",
+                    "--social-gradient": SOCIAL_GRADIENTS[social.label] ?? "linear-gradient(135deg, #da020e, #6e0410)",
                     "--social-color": SOCIAL_COLORS[social.label] ?? "#fff",
                   } as React.CSSProperties}
                   initial={{ opacity: 0, x: 24 }}

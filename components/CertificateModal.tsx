@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,12 +21,19 @@ export default function CertificateModal({
 }: CertificateModalProps) {
   const documentUrl = `/documents/${certificate.documentSlug}`;
   const [mounted, setMounted] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // Move focus into the dialog so keyboard/screen-reader users aren't
+    // left stranded on whatever card triggered it.
+    const focusTimer = window.setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -38,6 +45,7 @@ export default function CertificateModal({
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      window.clearTimeout(focusTimer);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [onClose]);
@@ -50,6 +58,9 @@ export default function CertificateModal({
     <AnimatePresence>
       <motion.div
         className="certv3-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${certificate.title} certificate`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -75,6 +86,7 @@ export default function CertificateModal({
           {/* RIGHT: info sidebar */}
           <div className="certv3-sidebar">
             <button
+              ref={closeButtonRef}
               type="button"
               className="certv3-close"
               onClick={onClose}
