@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { navigationItems, scrollToSection, type SectionId } from "@/lib/navigation";
@@ -12,6 +13,9 @@ export default function Navbar() {
   const [activeId, setActiveId] = useState<SectionId | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === "/";
 
   // Entrance animation
   useEffect(() => {
@@ -46,8 +50,22 @@ export default function Navbar() {
     };
   }, []);
 
-  // Active section via IntersectionObserver
+  // Navbar now persists across client-side navigations (it lives in the
+  // root layout) instead of remounting per page, and Next.js resets scroll
+  // position on route changes — recompute the "scrolled" background state
+  // so it doesn't stay stuck from whatever page you navigated away from.
   useEffect(() => {
+    setScrolled(window.scrollY > 24);
+  }, [pathname]);
+
+  // Active section via IntersectionObserver — only meaningful on the home page,
+  // where the sections actually live in the DOM.
+  useEffect(() => {
+    if (!isHome) {
+      setActiveId(null);
+      return;
+    }
+
     const navEl = navRef.current;
     if (!navEl) return;
 
@@ -99,7 +117,7 @@ export default function Navbar() {
       observer?.disconnect();
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [isHome]);
 
   // Close mobile menu on wide viewport
   useEffect(() => {
@@ -114,6 +132,15 @@ export default function Navbar() {
 
   const handleNavigate = (target: SectionId | "top") => {
     setMenuOpen(false);
+
+    // Section links only exist in the DOM on the home page. From any other
+    // page (e.g. a project detail page), route home first — straight
+    // scrollToSection() there used to silently do nothing.
+    if (!isHome) {
+      router.push(target === "top" ? "/" : `/#${target}`);
+      return;
+    }
+
     scrollToSection(target);
   };
 
@@ -149,7 +176,7 @@ export default function Navbar() {
         {/* Desktop nav links */}
         <nav id="primary-navigation" className="nav-links" aria-label="Primary">
           {navigationItems.map((item) => {
-            const isActive = activeId === item.id;
+            const isActive = isHome && activeId === item.id;
             return (
               <button
                 key={item.id}
@@ -200,7 +227,7 @@ export default function Navbar() {
             <button
               key={item.id}
               type="button"
-              className={`nav-drawer-link${activeId === item.id ? " is-active" : ""}`}
+              className={`nav-drawer-link${isHome && activeId === item.id ? " is-active" : ""}`}
               onClick={() => handleNavigate(item.id)}
               tabIndex={menuOpen ? 0 : -1}
               data-hover

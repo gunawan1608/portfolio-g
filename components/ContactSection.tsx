@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactElement, useState, useRef } from "react";
+import { type CSSProperties, type ReactElement, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { contact, profile } from "@/lib/site-data";
 
@@ -239,7 +239,7 @@ export default function ContactSection() {
                   style={{
                     "--social-gradient": SOCIAL_GRADIENTS[social.label] ?? "linear-gradient(135deg, #da020e, #6e0410)",
                     "--social-color": SOCIAL_COLORS[social.label] ?? "#fff",
-                  } as React.CSSProperties}
+                  } as CSSProperties}
                   initial={{ opacity: 0, x: 24 }}
                   animate={isInView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.28 + index * 0.1, ease: E }}
@@ -263,22 +263,6 @@ export default function ContactSection() {
                 </motion.a>
               ))}
             </div>
-
-            {/* Bottom CTA nudge */}
-            <motion.div
-              className="contact-nudge"
-              initial={{ opacity: 0, y: 16 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.58, ease: E }}
-            >
-              <div className="contact-nudge-avatar">
-                <span>GM</span>
-                <span className="contact-nudge-avatar-dot" />
-              </div>
-              <p className="contact-nudge-text">
-                <strong>Gunawan Madia</strong> is open to projects, collaborations, and helpful conversations.
-              </p>
-            </motion.div>
           </div>
         </div>
       </div>

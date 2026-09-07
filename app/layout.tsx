@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CursorFollower from "@/components/CursorFollower";
+import Footer from "@/components/Footer";
+import IntroLoader from "@/components/IntroLoader";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Gunawan Madia Pratama | Portfolio",
@@ -28,7 +32,26 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {/*
+          IntroLoader, CursorFollower, Navbar, and Footer live here — outside
+          the per-route `template.tsx` transition — for two reasons:
+          1. They shouldn't re-play their own animation on every navigation,
+             only the page content should transition.
+          2. template.tsx animates transform/filter on its wrapper, which
+             creates a new containing block for any position:fixed
+             descendant. Putting fixed-position chrome inside that wrapper
+             would silently break it — it would start tracking the wrapper
+             instead of the viewport once the animation applies its values.
+        */}
+        <IntroLoader />
+        <div className="site-shell">
+          <CursorFollower />
+          <Navbar />
+          <main className="site-main">{children}</main>
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }

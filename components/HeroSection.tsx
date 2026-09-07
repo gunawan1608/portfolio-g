@@ -102,27 +102,14 @@ export default function HeroSection() {
     },
   ];
 
-  // Portfolio highlights (bottom card)
+  // Portfolio highlights (bottom card) — repo count intentionally left out here,
+  // it's already shown live in the stats row above; repeating it read as filler.
   const HIGHLIGHTS: {
     icon: ReactElement;
     label: string;
     value: string;
     sub: string;
-    isGh?: boolean;
-    ghValue?: number;
   }[] = [
-    {
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
-        </svg>
-      ),
-      label: "Repositories",
-      value: ghLoading ? "—" : String(ghStats?.publicRepos ?? 0),
-      sub: "public on GitHub",
-      isGh: true,
-      ghValue: ghStats?.publicRepos,
-    },
     {
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -311,88 +298,12 @@ export default function HeroSection() {
             <span>Synced with github.com/gunawan1608</span>
           </motion.div>
 
-          {/* Portfolio working style */}
-          <motion.div
-            className="hero-building-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.58, ease: E }}
-          >
-            <div className="hero-building-head">
-              <p className="hero-building-label">How I build</p>
-              <span className="hero-building-status">
-                <span className="hero-building-status-dot" aria-hidden />
-                Focused
-              </span>
-            </div>
-            <div className="hero-building-list">
-              {[
-                {
-                  icon: (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <rect x="3" y="4" width="18" height="14" rx="2" />
-                      <path d="M8 20h8" />
-                      <path d="M12 18v2" />
-                    </svg>
-                  ),
-                  name: "Responsive first",
-                  desc: "check the layout before the shine",
-                  tag: "Core",
-                  tagClass: "hero-building-tag--active",
-                },
-                {
-                  icon: (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M12 3v18" />
-                      <path d="M3 12h18" />
-                      <path d="m5 5 14 14" />
-                      <path d="m19 5-14 14" />
-                    </svg>
-                  ),
-                  name: "Motion with care",
-                  desc: "small transitions with a clear purpose",
-                  tag: "Active",
-                  tagClass: "hero-building-tag--wip",
-                },
-                {
-                  icon: (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M4 7h16" />
-                      <path d="M4 12h16" />
-                      <path d="M4 17h10" />
-                    </svg>
-                  ),
-                  name: "Readable systems",
-                  desc: "components kept easy to revisit",
-                  tag: "Habit",
-                  tagClass: "hero-building-tag--soon",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.name}
-                  className="hero-building-item"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, delay: 0.65 + i * 0.06, ease: E }}
-                  whileHover={{ y: -2 }}
-                >
-                  <span className="hero-building-icon">{item.icon}</span>
-                  <span className="hero-building-info">
-                    <span className="hero-building-name">{item.name}</span>
-                    <span className="hero-building-desc">{item.desc}</span>
-                  </span>
-                  <span className={`hero-building-tag ${item.tagClass}`}>{item.tag}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
           {/* Portfolio Highlights */}
           <motion.div
             className="hero-highlights-card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.72, ease: E }}
+            transition={{ duration: 0.55, delay: 0.58, ease: E }}
           >
             <div className="hero-highlights-head">
               <p className="hero-highlights-label">Quick look</p>
@@ -412,13 +323,7 @@ export default function HeroSection() {
                     <span className="hero-highlight-label">{item.label}</span>
                     <span className="hero-highlight-sub">{item.sub}</span>
                   </span>
-                  <strong className="hero-highlight-value">
-                    {item.isGh && ghLoading ? (
-                      <span className="hero-stat-skeleton hero-stat-skeleton--sm" aria-hidden />
-                    ) : (
-                      item.value
-                    )}
-                  </strong>
+                  <strong className="hero-highlight-value">{item.value}</strong>
                 </motion.div>
               ))}
             </div>
